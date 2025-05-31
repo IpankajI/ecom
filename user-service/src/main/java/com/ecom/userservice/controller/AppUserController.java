@@ -25,9 +25,14 @@ public class AppUserController {
     }
 
 
-    @GetMapping("/{phone_number}")
-    public AppUser getAppUser(@PathVariable("phone_number") String phoneNumber){
-        return appUserService.getAppUserByPhoneNumber(phoneNumber);
+    // @GetMapping("/{phone_number}")
+    // public AppUser getAppUserByPhoneNumber(@PathVariable("phone_number") String phoneNumber){
+    //     return appUserService.getAppUserByPhoneNumber(phoneNumber);
+    // }
+
+    @GetMapping("/{username}")
+    public AppUser getAppUserByUsername(@PathVariable("username") String username){
+        return appUserService.getAppUserByUsername(username);
     }
 
 }

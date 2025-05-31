@@ -24,4 +24,8 @@ public class AppUserService {
         return appUserRepository.getByPhoneNumber(phoneNumber);
     }
 
+    public AppUser getAppUserByUsername(String username){
+        return appUserRepository.getByName(username);
+    }
+
 }

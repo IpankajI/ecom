@@ -35,12 +35,22 @@ public class ProductService {
     }
     
 
-    public List<ProductResponse> getAllProducts(){
+    public List<ProductResponse> getProducts(){
         List<Product> products=productRepository.findAll();
 
         List<ProductResponse> productResponses = products.stream().map(product -> ProductResponseFrom(product)).toList();
 
         return productResponses;
+    }
+
+    public ProductResponse getProduct(String productId){
+        Product product=productRepository.findById(productId).get();
+
+        if(product==null){
+            throw new RuntimeException("no such product");
+        }
+ 
+        return ProductResponseFrom(product);
     }
 
     private ProductResponse ProductResponseFrom(Product product){

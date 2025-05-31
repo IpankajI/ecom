@@ -2,23 +2,36 @@ package com.ecom.apigateway.security.userpassword;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.ecom.apigateway.model.AppUser;
+import com.ecom.apigateway.service.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
+@RequiredArgsConstructor
 public class ProviderUsernamePassword implements AuthenticationProvider{
 
+    final private UserService userService;
+    final private PasswordEncoder passwordEncoder;
+
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) {
 
         String username=(String)authentication.getPrincipal();
         String password=(String)authentication.getCredentials();
         
-        if(username==null || password==null || !username.equals("username1") || !password.equals("password1")){
-            throw new BadCredentialsException("username or password not correct");
+        if(username==null || password==null){
+            return null;
+        }
+
+        AppUser appUser=userService.getUser(username);
+        if (appUser==null || !passwordEncoder.matches(password, appUser.getPassword())) {
+            return null;
         }
 
         AuthNUsernamePassword auth=new AuthNUsernamePassword(username);
