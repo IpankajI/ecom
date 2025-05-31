@@ -1,0 +1,30 @@
+services:
+  app:
+    build: hello
+    ports:
+      - "8080:8000"
+    networks:
+      - s-networks
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=hello
+      - PGUSER=pankaj
+    ports:
+      - "5432:5432"
+    networks:
+      - s-networks
+    volumes:
+      - postgres-s-data:/var/lib/postgresql/data
+
+networks:
+  s-networks:
+    driver: bridge
+
+volumes:
+  postgres-s-data:
