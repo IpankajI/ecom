@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "inventory_operations")
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@ToString
 public class InventoryOperation {
     @Id
     private String operationId;

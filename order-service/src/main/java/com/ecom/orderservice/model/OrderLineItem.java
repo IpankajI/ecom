@@ -2,6 +2,7 @@ package com.ecom.orderservice.model;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,8 +26,10 @@ public class OrderLineItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String skuCode;
-    private BigDecimal price;
+    private BigDecimal totalAmount;
     private Integer quantity;
     @ManyToOne
     private Order order;
+    @Column(nullable = false)
+    private String productId;
 }

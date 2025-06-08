@@ -1,9 +1,12 @@
 package com.ecom.orderservice.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,4 +31,9 @@ public class Order {
     private String orderNumber;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "order")
     private List<OrderLineItem> orderLineItems;
+    private BigDecimal totalAmount;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+    @Enumerated(EnumType.STRING)
+    private OrderPaymentStatus paymentStatus;
 }

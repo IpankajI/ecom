@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -40,6 +42,7 @@ public class InventoryService {
         return inventory.isPresent() && inventory.get().getQuantity()>0;
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Inventory getInventory(String productId){
 
         Inventory inventory=inventoryRepository.getByProductId(productId);
@@ -69,8 +72,10 @@ public class InventoryService {
         inventoryRepository.save(inventory);
     }
 
-    @Transactional
     public void incrementQuantityBy(String productId , Integer incBy){
+        // also take lock on inventory record
+
+
         Inventory inventory=inventoryRepository.getByProductId(productId);
         if(inventory==null){
             throw new RuntimeException("no such product");
@@ -93,11 +98,12 @@ public class InventoryService {
         inventoryOperationRepository.save(inventoryOperation);
     }
 
-    @Transactional
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void claimInventory(String productId, Integer quanity){
         if(quanity<=0){
             throw new RuntimeException("claim quanity should be positive");
         }
+        // also take lock on inventory record
         Inventory inventory=inventoryRepository.getByProductId(productId);
         if(inventory==null){
             throw new RuntimeException("no such product");
@@ -124,9 +130,19 @@ public class InventoryService {
         inventoryOperationRepository.save(inventoryOperation);
     }
 
-    @Transactional
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void markInventoryClaimSold(String operationId){
         InventoryOperation inventoryOperation=inventoryOperationRepository.findById(operationId).get();
+        if(inventoryOperation==null){
+            throw new RuntimeException("no such claim");
+        }
+        // also take lock on inventory record
+        Inventory inventory=inventoryRepository.findById((long)inventoryOperation.getInventoryId()).get();
+        if(inventory==null){
+            throw new RuntimeException("inventory not found");
+        }
+        //fetch again to respect the lock
+        inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){
             throw new RuntimeException("no such claim");
         }
