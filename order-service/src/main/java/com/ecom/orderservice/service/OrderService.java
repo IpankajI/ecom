@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.orderservice.dto.OrderLineItemRequest;
@@ -31,7 +32,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient webClient;
     
-    public void createOrder(OrderRequest orderRequest){
+    public OrderResponse createOrder(OrderRequest orderRequest){
 
         Order order=new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
@@ -44,14 +45,16 @@ public class OrderService {
         order.setStatus(OrderStatus.OrderStatusCreated);
         order.setPaymentStatus(OrderPaymentStatus.OrderPaymentStatusPending);
 
-        orderRepository.save(order);
+        Order orderSaved=orderRepository.save(order);
+
+        return orderResponseFrom(orderSaved);
     }
 
+    @Transactional
     public OrderResponse getOrder(Long orderId){
         Order order=orderRepository.findById(orderId).get();
         return orderResponseFrom(order);
     }
-
 
     public List<OrderResponse> getOrders(){
         List<Order> orders=orderRepository.findAll();
@@ -64,6 +67,71 @@ public class OrderService {
 
         return orderResponses;
         
+    }
+
+
+    @Transactional
+    public OrderResponse updateOrderPaymentStatus(Long orderId, OrderPaymentStatus paymentStatus){
+        Order order=orderRepository.findById(orderId).get();
+        if(!validateUpdateOrderPaymentStatus(order, paymentStatus)){
+            throw new RuntimeException("order payment status update not allowed");
+        }
+        order.setPaymentStatus(paymentStatus);
+        order=orderRepository.save(order);
+        return orderResponseFrom(order);
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus){
+        Order order=orderRepository.findById(orderId).get();
+        if(!validateUpdateOrderStatus(order, orderStatus)){
+            throw new RuntimeException("order status update not allowed");
+        }
+        order.setStatus(orderStatus);
+        order=orderRepository.save(order);
+        return orderResponseFrom(order);
+    }
+
+    private boolean validateUpdateOrderStatus(Order order, OrderStatus newOrderStatus){
+        switch (order.getStatus()) {
+            case OrderStatusCreated:
+                if(newOrderStatus==OrderStatus.OrderStatusComplete || newOrderStatus==OrderStatus.OrderStatusCancelled){
+                    return true;
+                }
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    private boolean validateUpdateOrderPaymentStatus(Order order, OrderPaymentStatus newOrderPaymentStatus){
+        switch (order.getPaymentStatus()) {
+            case OrderPaymentStatusInitiated:
+                if(newOrderPaymentStatus==OrderPaymentStatus.OrderPaymentStatusCompleted){
+                    return true;
+                }
+                break;
+            case OrderPaymentStatus.OrderPaymentStatusPending:
+                if(newOrderPaymentStatus==OrderPaymentStatus.OrderPaymentStatusInitiated){
+                    return true;
+                }
+                break;
+            case OrderPaymentStatus.OrderPaymentStatusCompleted:
+                if(newOrderPaymentStatus==OrderPaymentStatus.OrderPaymentStatusRefundInitiated){
+                    return true;
+                }
+                break;
+            case OrderPaymentStatus.OrderPaymentStatusRefundInitiated:
+                if(newOrderPaymentStatus==OrderPaymentStatus.OrderPaymentStatusRefunded){
+                    return true;
+                }
+                break;
+        
+            default:
+                break;
+        }
+        return false;
     }
 
     private OrderLineItem orderLineItemFrom(OrderLineItemRequest orderLineItemRequest, Order order){

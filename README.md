@@ -5,3 +5,5 @@ building a e-commerce plaform with java and spring.
 2. set up authentication and authorization 
 3. implement inventory and claim mechanism
 4. add payment service
+5. add async processing for payment and order status update
+6. add migration tools

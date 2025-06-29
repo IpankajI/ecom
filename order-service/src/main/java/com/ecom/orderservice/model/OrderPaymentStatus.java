@@ -3,7 +3,7 @@ package com.ecom.orderservice.model;
 public enum OrderPaymentStatus {
     OrderPaymentStatusPending,
     OrderPaymentStatusInitiated,
-    OrderPaymentStatusSuccess,
+    OrderPaymentStatusCompleted,
     OrderPaymentStatusFailed,
     OrderPaymentStatusRefundInitiated,
     OrderPaymentStatusRefunded

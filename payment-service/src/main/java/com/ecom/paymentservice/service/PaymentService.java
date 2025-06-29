@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.paymentservice.Repository.PaymentRepository;
@@ -12,6 +14,7 @@ import com.ecom.paymentservice.dto.PaymentResponse;
 import com.ecom.paymentservice.model.Payment;
 import com.ecom.paymentservice.model.PaymentStatus;
 
+import org.springframework.transaction.annotation.Transactional;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -48,14 +51,15 @@ public class PaymentService {
         return PaymentResponseFrom(payment);
     }
 
+    @Transactional
     public PaymentResponse getPayment(Integer paymentId){
         Payment payment=paymentRepository.findById(paymentId).get();
         return PaymentResponseFrom(payment);
     }
 
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public PaymentResponse updateStatus(Integer paymentId, PaymentStatus paymentStatus){
-
 
         Payment payment=paymentRepository.findById(paymentId).get();
 
@@ -77,6 +81,16 @@ public class PaymentService {
                 break;
             case PaymentStatusInitiated:
                 if(newPaymentStatus==PaymentStatus.PaymentStatusSuccess){
+                    return true;
+                }
+                break;
+            case PaymentStatusSuccess:
+                if(newPaymentStatus==PaymentStatus.PaymentStatusRefundInitiated){
+                    return true;
+                }
+                break;
+            case PaymentStatusRefundInitiated:
+                if(newPaymentStatus==PaymentStatus.PaymentStatusRefunded){
                     return true;
                 }
                 break;

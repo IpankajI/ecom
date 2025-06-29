@@ -26,7 +26,7 @@ spring:
           uri: http://localhost:30003
           predicates:
             - Path=/api/orders/**
-            - Method=GET,POST
+            - Method=GET,POST,PATCH
         inventory-service:
           uri: http://localhost:30002
           predicates:

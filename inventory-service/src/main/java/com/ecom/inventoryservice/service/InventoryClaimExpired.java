@@ -20,8 +20,6 @@ import com.ecom.inventoryservice.model.InventoryOperationType;
 import com.ecom.inventoryservice.repository.InventoryOperationRepository;
 import com.ecom.inventoryservice.repository.InventoryRepository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
 
 @Component

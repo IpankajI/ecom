@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import com.ecom.inventoryservice.model.Inventory;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.lang.NonNull;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long>{
     Optional<Inventory> findBySkuCode(String skuCode);
@@ -17,6 +18,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long>{
     Inventory getByProductId(String productId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Inventory> findById(Long id);
+    @NonNull Optional<Inventory> findById(@NonNull Long id);
 
 }
