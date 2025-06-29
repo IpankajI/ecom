@@ -55,7 +55,7 @@ spring:
           uri: http://localhost:30005
           predicates:
             - Path=/api/payments/**
-            - Method=GET,POST
+            - Method=GET,POST,PATCH
     function.definition: consumeHello
     stream.bindings.consumeHello-in-0.destination: hello-out-0
 # logging:

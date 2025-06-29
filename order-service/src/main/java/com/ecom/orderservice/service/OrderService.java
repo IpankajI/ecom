@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.orderservice.dto.OrderLineItemRequest;
@@ -33,7 +31,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient webClient;
     
-    public void createOrder(@RequestBody OrderRequest orderRequest){
+    public void createOrder(OrderRequest orderRequest){
 
         Order order=new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
@@ -55,7 +53,6 @@ public class OrderService {
     }
 
 
-    @GetMapping
     public List<OrderResponse> getOrders(){
         List<Order> orders=orderRepository.findAll();
 
