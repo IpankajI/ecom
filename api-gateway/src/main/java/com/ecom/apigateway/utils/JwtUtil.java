@@ -2,7 +2,6 @@ package com.ecom.apigateway.utils;
 
 import io.jsonwebtoken.*;
 
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
@@ -18,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.Base64;
 
 
 @Component
@@ -30,8 +30,8 @@ public class JwtUtil {
         KeyPairGenerator keyPairGenerator=KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         KeyPair keyPair=keyPairGenerator.generateKeyPair();
-        publicKey = Base64.encodeBase64String(keyPair.getPublic().getEncoded());
-        privateKey = Base64.encodeBase64String(keyPair.getPrivate().getEncoded());
+        publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+        privateKey = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
         System.out.println(".......public key: "+publicKey); 
     }
 
@@ -53,14 +53,14 @@ public class JwtUtil {
 
     public PublicKey generateJwtKeyDecryption() throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        byte[] keyBytes = Base64.decodeBase64(publicKey);
+        byte[] keyBytes = Base64.getDecoder().decode(publicKey);
         X509EncodedKeySpec x509EncodedKeySpec=new X509EncodedKeySpec(keyBytes);
         return keyFactory.generatePublic(x509EncodedKeySpec);
     }
 
     public PrivateKey generateJwtKeyEncryption() throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        byte[] keyBytes = Base64.decodeBase64(privateKey);
+        byte[] keyBytes = Base64.getDecoder().decode(privateKey);
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec=new PKCS8EncodedKeySpec(keyBytes);
         return keyFactory.generatePrivate(pkcs8EncodedKeySpec);
     }

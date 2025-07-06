@@ -1,6 +1,5 @@
 package com.ecom.inventoryservice.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.inventoryservice.appconfig.AppConfig;
+import com.ecom.inventoryservice.dto.ClaimInventoryResponse;
+import com.ecom.inventoryservice.dto.ProductResponse;
 import com.ecom.inventoryservice.model.Inventory;
 import com.ecom.inventoryservice.model.InventoryOperation;
 import com.ecom.inventoryservice.model.InventoryOperationStatus;
@@ -20,7 +21,6 @@ import com.ecom.inventoryservice.model.InventoryOperationType;
 import com.ecom.inventoryservice.repository.InventoryOperationRepository;
 import com.ecom.inventoryservice.repository.InventoryRepository;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -58,11 +58,11 @@ public class InventoryService {
 
     public void addInventory(Inventory inventory){
 
-        Product product=webClient
+        ProductResponse product=webClient
             .get()
             .uri("http://localhost:30001/api/products/"+inventory.getProductId())
             .retrieve()
-            .bodyToMono(Product.class)
+            .bodyToMono(ProductResponse.class)
             .block();
 
         if(product==null || !product.getId().equals(inventory.getProductId())){
@@ -72,9 +72,9 @@ public class InventoryService {
         inventoryRepository.save(inventory);
     }
 
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void incrementQuantityBy(String productId , Integer incBy){
         // also take lock on inventory record
-
 
         Inventory inventory=inventoryRepository.getByProductId(productId);
         if(inventory==null){
@@ -99,7 +99,7 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public void claimInventory(String productId, Integer quanity){
+    public ClaimInventoryResponse claimInventory(String productId, Integer quanity){
         if(quanity<=0){
             throw new RuntimeException("claim quanity should be positive");
         }
@@ -127,7 +127,16 @@ public class InventoryService {
                         .quantity(quanity)
                         .updatedAt(now)
                         .build();
-        inventoryOperationRepository.save(inventoryOperation);
+        inventoryOperation=inventoryOperationRepository.save(inventoryOperation);
+
+        ClaimInventoryResponse claimInventoryResponse=ClaimInventoryResponseFrom(inventoryOperation);
+
+        return claimInventoryResponse;
+    }
+
+    private ClaimInventoryResponse ClaimInventoryResponseFrom(InventoryOperation inventoryOperation){
+        ClaimInventoryResponse claimInventoryResponse=new ClaimInventoryResponse(inventoryOperation.getOperationId());
+        return claimInventoryResponse;
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -135,6 +144,9 @@ public class InventoryService {
         InventoryOperation inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){
             throw new RuntimeException("no such claim");
+        }
+        if(inventoryOperation.getInventoryOperationStatus()==InventoryOperationStatus.InventoryOperationStatusCompleted){
+            return;
         }
         // also take lock on inventory record
         Inventory inventory=inventoryRepository.findById((long)inventoryOperation.getInventoryId()).get();
@@ -149,11 +161,11 @@ public class InventoryService {
 
         if(inventoryOperation.getInventoryOperationType()!=InventoryOperationType.InventoryOperationTypeClaim
             || inventoryOperation.getInventoryOperationStatus()!=InventoryOperationStatus.InventoryOperationStatusInitiated){
-            throw new RuntimeException("invalid operation");
+            throw new RuntimeException("invalid operation for op id: "+operationId);
         }
 
         if(inventoryOperation.getCreateAt().isBefore(LocalDateTime.now().minusMinutes(appConfig.inventoryClaimExpiryInMinutes))){
-            throw new RuntimeException("claim expired");
+            throw new RuntimeException("claim expired for op id: "+operationId);
         }
 
         inventoryOperation.setInventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusCompleted);   
@@ -164,11 +176,3 @@ public class InventoryService {
 }
 
 
-@Getter
-class Product {
-    private String id;
-    private String name;
-    private String description;
-    private BigDecimal price;
-    
-}

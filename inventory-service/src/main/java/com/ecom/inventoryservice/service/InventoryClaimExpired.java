@@ -20,6 +20,8 @@ import com.ecom.inventoryservice.model.InventoryOperationType;
 import com.ecom.inventoryservice.repository.InventoryOperationRepository;
 import com.ecom.inventoryservice.repository.InventoryRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -76,3 +78,14 @@ public class InventoryClaimExpired {
 
     }
 }
+
+
+
+// @Getter
+// class Product {
+//     private String id;
+//     private String name;
+//     private String description;
+//     private BigDecimal price;
+    
+// }

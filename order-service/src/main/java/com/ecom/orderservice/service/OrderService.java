@@ -1,13 +1,18 @@
 package com.ecom.orderservice.service;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.proxy.ProxyConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.ecom.orderservice.dto.InventoryClaimRequest;
+import com.ecom.orderservice.dto.InventoryClaimResponse;
 import com.ecom.orderservice.dto.OrderLineItemRequest;
 import com.ecom.orderservice.dto.OrderLineItemResponse;
 import com.ecom.orderservice.dto.OrderRequest;
@@ -23,6 +28,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import reactor.core.publisher.Mono;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.SqsClientBuilder;
+import software.amazon.awssdk.services.sqs.endpoints.SqsEndpointParams;
+import software.amazon.awssdk.services.sqs.endpoints.SqsEndpointProvider;
+import software.amazon.awssdk.services.sqs.endpoints.internal.AwsEndpointProviderUtils;
+import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
+import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
+import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
+import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SqsException;
+import software.amazon.awssdk.services.sqs.model.SqsRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +61,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final WebClient webClient;
+    // private final SqsClient sqsClient;
+    private final SqsAsyncClient sqsClient;
     
     public OrderResponse createOrder(OrderRequest orderRequest){
 
@@ -44,26 +76,53 @@ public class OrderService {
 
         order.setStatus(OrderStatus.OrderStatusCreated);
         order.setPaymentStatus(OrderPaymentStatus.OrderPaymentStatusPending);
-
+        claimInventory(orderLineItems);
         Order orderSaved=orderRepository.save(order);
 
         return orderResponseFrom(orderSaved);
     }
 
+    private void claimInventory(List<OrderLineItem> orderLineItems){
+
+        for(OrderLineItem orderLineItem: orderLineItems){
+            InventoryClaimRequest inventoryClaimRequest=InventoryClaimRequest.builder().quantity(orderLineItem.getQuantity()).build();
+            InventoryClaimResponse inventoryClaimResponse=webClient.post()
+            .uri("http://localhost:30002/api/inventories/"+orderLineItem.getProductId()+"/claim")
+            .bodyValue(inventoryClaimRequest)
+            .retrieve()
+            .bodyToMono(InventoryClaimResponse.class)
+            .block();
+
+            orderLineItem.setInventoryClaimId(inventoryClaimResponse.getClaimId());
+        }
+
+    }
+
+    private void markClaimedInventory(List<OrderLineItem> orderLineItems){
+
+        for(OrderLineItem orderLineItem: orderLineItems){
+            webClient.patch()
+                .uri("http://localhost:30002/api/inventories/"+orderLineItem.getProductId()+"/claim/"+orderLineItem.getInventoryClaimId())
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+        }
+
+    }
+
     @Transactional
     public OrderResponse getOrder(Long orderId){
         Order order=orderRepository.findById(orderId).get();
+
         return orderResponseFrom(order);
     }
+
+
 
     public List<OrderResponse> getOrders(){
         List<Order> orders=orderRepository.findAll();
 
         List<OrderResponse> orderResponses=orders.stream().map(this::orderResponseFrom).toList();
-
-        // Boolean data=webClient.get().uri("http://localhost:30002/api/inventories/iphone_12").retrieve().bodyToMono(Boolean.class).block();
-
-        // System.out.println(".............. "+data);
 
         return orderResponses;
         
@@ -73,6 +132,13 @@ public class OrderService {
     @Transactional
     public OrderResponse updateOrderPaymentStatus(Long orderId, OrderPaymentStatus paymentStatus){
         Order order=orderRepository.findById(orderId).get();
+        if(order.getPaymentStatus()==paymentStatus){
+            return orderResponseFrom(order);
+        }
+        System.out.println(".....order "+orderId+" "+paymentStatus+" "+order.getPaymentStatus());
+
+        markClaimedInventory(order.getOrderLineItems());
+
         if(!validateUpdateOrderPaymentStatus(order, paymentStatus)){
             throw new RuntimeException("order payment status update not allowed");
         }
@@ -106,6 +172,7 @@ public class OrderService {
     }
 
     private boolean validateUpdateOrderPaymentStatus(Order order, OrderPaymentStatus newOrderPaymentStatus){
+        System.out.println("......... "+order.getPaymentStatus()+" "+newOrderPaymentStatus);
         switch (order.getPaymentStatus()) {
             case OrderPaymentStatusInitiated:
                 if(newOrderPaymentStatus==OrderPaymentStatus.OrderPaymentStatusCompleted){

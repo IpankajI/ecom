@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecom.inventoryservice.dto.ClaimInventoryRequest;
+import com.ecom.inventoryservice.dto.ClaimInventoryResponse;
 import com.ecom.inventoryservice.dto.IncrementInventoryQuantityRequest;
 import com.ecom.inventoryservice.dto.InventoryRequest;
 import com.ecom.inventoryservice.dto.InventoryResponse;
@@ -28,11 +29,6 @@ public class InventoryController {
     
     private final InventoryService inventoryService;
 
-    // @GetMapping("{sku-code}")
-    // @ResponseStatus(HttpStatus.OK)
-    // public boolean isInStock(@PathVariable("sku-code") String skuCode){
-    //     return inventoryService.isInStock(skuCode);
-    // }
 
     @GetMapping
     public List<InventoryResponse> getInventories(){
@@ -83,11 +79,11 @@ public class InventoryController {
     }
 
     @PostMapping("/{productId}/claim")
-    public void claimInventoryQuantity(@PathVariable("productId") String productId, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
-        inventoryService.claimInventory(productId, claimInventoryRequest.getQuantity());
+    public ClaimInventoryResponse claimInventoryQuantity(@PathVariable("productId") String productId, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
+        return inventoryService.claimInventory(productId, claimInventoryRequest.getQuantity());
     }
 
-    @PostMapping("/{productId}/claim/{claim_id}")
+    @PatchMapping("/{productId}/claim/{claim_id}")
     public void markClaimCompleted(@PathVariable("claim_id") String claimId){
         inventoryService.markInventoryClaimSold(claimId);
     }

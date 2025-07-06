@@ -32,4 +32,5 @@ public class OrderLineItem {
     private Order order;
     @Column(nullable = false)
     private String productId;
+    private String inventoryClaimId;
 }

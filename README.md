@@ -1,9 +1,19 @@
 building a e-commerce plaform with java and spring.
 
 # Roadmap:
-1. set up project
-2. set up authentication and authorization 
-3. implement inventory and claim mechanism
-4. add payment service
-5. add async processing for payment and order status update
-6. add migration tools
+[] set up project
+[] set up authentication and authorization 
+[] implement inventory and claim mechanism
+[] add payment service
+[] add async processing for payment and order status update
+[] add migration tools
+[] add migration tools
+
+
+# queue:
+docker run \
+  --rm -it \
+  -p 127.0.0.1:4566:4566 \
+  -p 127.0.0.1:4510-4559:4510-4559 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  localstack/localstack

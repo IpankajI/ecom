@@ -1,4 +1,4 @@
-package com.ecom.paymentservice.appconfig;
+package com.ecom.eventhandler.config;
 
 import java.net.URI;
 
@@ -13,12 +13,6 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 
 @Component
 public class AppConfig {
-    
-
-    @Bean
-    public WebClient webClient(){
-        return WebClient.builder().build();
-    }
 
     @Bean
     public SqsClient sqsClient(){
@@ -45,4 +39,11 @@ public class AppConfig {
 
         return sqsClient;
     }
+    
+    @Bean
+	public WebClient webClient(){
+		return WebClient.builder().build();
+	}
+
 }
+
