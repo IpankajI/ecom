@@ -60,7 +60,7 @@ public class InventoryService {
 
         ProductResponse product=webClient
             .get()
-            .uri("http://localhost:30001/api/products/"+inventory.getProductId())
+            .uri("http://product-service:30001/api/products/"+inventory.getProductId())
             .retrieve()
             .bodyToMono(ProductResponse.class)
             .block();

@@ -14,7 +14,7 @@ public class UserService {
     final private WebClient webClient;
 
     public AppUser getUser(String username){
-        AppUser appUser=webClient.get().uri("http://localhost:30004/api/users/"+username)
+        AppUser appUser=webClient.get().uri("http://user-service:30004/api/users/"+username)
                             .retrieve()
                             .bodyToMono(AppUser.class)
                             .block();

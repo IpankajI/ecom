@@ -16,7 +16,7 @@ public class Queue {
     
     @Bean
     public SqsClient sqsClient(){
-        String endpoint = "http://localhost:4566";
+        String endpoint = "http://queue:4566";
         // String endpoint = "http://localhost:9325/";
         // String region = "elasticmq";
         String accessKey = "x";
@@ -43,7 +43,7 @@ public class Queue {
 
     @Bean
     public SqsAsyncClient sqsAsyncClient(){
-        String endpoint = "http://localhost:4566";
+        String endpoint = "http://queue:4566";
         // String endpoint = "http://localhost:9325/";
         // String region = "elasticmq";
         String accessKey = "x";

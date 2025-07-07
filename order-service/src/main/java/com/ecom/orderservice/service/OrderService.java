@@ -3,6 +3,7 @@ package com.ecom.orderservice.service;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,7 +88,7 @@ public class OrderService {
         for(OrderLineItem orderLineItem: orderLineItems){
             InventoryClaimRequest inventoryClaimRequest=InventoryClaimRequest.builder().quantity(orderLineItem.getQuantity()).build();
             InventoryClaimResponse inventoryClaimResponse=webClient.post()
-            .uri("http://localhost:30002/api/inventories/"+orderLineItem.getProductId()+"/claim")
+            .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getProductId()+"/claim")
             .bodyValue(inventoryClaimRequest)
             .retrieve()
             .bodyToMono(InventoryClaimResponse.class)
@@ -102,7 +103,7 @@ public class OrderService {
 
         for(OrderLineItem orderLineItem: orderLineItems){
             webClient.patch()
-                .uri("http://localhost:30002/api/inventories/"+orderLineItem.getProductId()+"/claim/"+orderLineItem.getInventoryClaimId())
+                .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getProductId()+"/claim/"+orderLineItem.getInventoryClaimId())
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -112,9 +113,11 @@ public class OrderService {
 
     @Transactional
     public OrderResponse getOrder(Long orderId){
-        Order order=orderRepository.findById(orderId).get();
-
-        return orderResponseFrom(order);
+        // Order order=orderRepository.findById(orderId).get();
+        System.out.println("hello, hot reloading!");
+        // return orderResponseFrom(order);
+        return orderResponseFrom(new Order(11l, "xx", 
+        new ArrayList<>(), new BigDecimal(0), OrderStatus.OrderStatusCreated, OrderPaymentStatus.OrderPaymentStatusCompleted));
     }
 
 
@@ -205,7 +208,7 @@ public class OrderService {
         
         
         Product product=webClient.get()
-            .uri("http://localhost:30001/api/products/"+orderLineItemRequest.getProductId())
+            .uri("http://product-service:30001/api/products/"+orderLineItemRequest.getProductId())
             .retrieve()
             .bodyToMono(Product.class)
             .block();

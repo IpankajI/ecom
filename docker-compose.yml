@@ -1,29 +1,135 @@
 services:
-  app:
-    build: hello
-    ports:
-      - "8080:8000"
-    networks:
-      - s-networks
-    depends_on:
-      - postgres
-
   postgres:
-    image: postgres:latest
+    image: postgres:14.18-bookworm
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=hello
-      - PGUSER=pankaj
+      - POSTGRES_DB=order-db
+      - PGUSER=root
     ports:
       - "5432:5432"
     networks:
-      - s-networks
+      - ecom-network
     volumes:
-      - postgres-s-data:/var/lib/postgresql/data
-
+      - ./postgres-data:/var/lib/postgresql/data
+  queue:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    networks:
+      - ecom-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  mongo:
+    image: mongodb/mongodb-community-server:6.0.19-ubi8
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=order-db
+      - PGUSER=root
+    ports:
+      - "27017:27017"
+    networks:
+      - ecom-network
+  api-gateway:
+    build:
+      context: api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./api-gateway:/app
+  event-handler:
+    build:
+      context: event-handler
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./event-handler:/app
+  inventory-service:
+    build:
+      context: inventory-service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./inventory-service:/app
+  order-service:
+    build:
+      context: order-service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./order-service:/app
+  payment-service:
+    build:
+      context: payment-service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./payment-service:/app
+  product-service:
+    build:
+      context: product-service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./product-service:/app
+  registry-server:
+    build:
+      context: registry-server
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./registry-server:/app
+  user-service:
+    build:
+      context: user-service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:30003"
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./user-service:/app
 networks:
-  s-networks:
+  ecom-network:
     driver: bridge
 
 volumes:

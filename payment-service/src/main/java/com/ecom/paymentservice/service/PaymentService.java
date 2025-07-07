@@ -36,7 +36,7 @@ public class PaymentService {
     public PaymentResponse initiatePayment(PaymentRequest paymentRequest){
         OrderResponse orderResponse=webClient
             .get()
-            .uri("http://localhost:30003/api/orders/"+paymentRequest.getOrderId())
+            .uri("http://order-service:30003/api/orders/"+paymentRequest.getOrderId())
             .retrieve()
             .bodyToMono(OrderResponse.class)
             .block();

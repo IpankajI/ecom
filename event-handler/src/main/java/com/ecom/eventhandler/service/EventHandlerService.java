@@ -112,7 +112,7 @@ public class EventHandlerService {
                         .paymentStatus(orderPaymentStatus)
                         .build();
         String data=webClient.patch()
-        .uri("http://localhost:30003/api/orders/"+paymentEvent.getOrderId()+"/paymentStatus")
+        .uri("http://order-service:30003/api/orders/"+paymentEvent.getOrderId()+"/paymentStatus")
         // .body(Mono.just(paymentStatusRequest), PaymentStatusRequest.class)
         // .body(BodyInserters.fromFormData("paymentStatus", "OrderPaymentStatusCompleted"))
         .bodyValue(paymentStatusRequest)
