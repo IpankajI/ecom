@@ -1,4 +1,4 @@
-building a e-commerce plaform with java and spring.
+building an e-commerce plaform with java and spring.
 
 # Roadmap:
 - [x] set up project
