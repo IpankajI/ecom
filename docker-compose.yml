@@ -20,7 +20,7 @@ services:
     networks:
       - ecom-network
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./tmp/queue:/var/run/docker.sock
   mongo:
     image: mongodb/mongodb-community-server:6.0.19-ubi8
     environment:
@@ -50,8 +50,6 @@ services:
     build:
       context: event-handler
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
@@ -62,8 +60,6 @@ services:
     build:
       context: inventory-service
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
@@ -74,8 +70,6 @@ services:
     build:
       context: order-service
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
@@ -86,8 +80,6 @@ services:
     build:
       context: payment-service
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
@@ -98,8 +90,6 @@ services:
     build:
       context: product-service
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
@@ -110,8 +100,6 @@ services:
     build:
       context: registry-server
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
@@ -122,8 +110,6 @@ services:
     build:
       context: user-service
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:30003"
     networks:
       - ecom-network
     depends_on:
