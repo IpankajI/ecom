@@ -24,7 +24,7 @@ import lombok.ToString;
 @ToString
 public class InventoryOperation {
     @Id
-    private String operationId;
+    private Long operationId;
     @Enumerated(EnumType.STRING)
     private InventoryOperationType inventoryOperationType;
     @Enumerated(EnumType.STRING)

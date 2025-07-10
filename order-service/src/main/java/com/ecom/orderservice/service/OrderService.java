@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.orderservice.dto.InventoryClaimRequest;
 import com.ecom.orderservice.dto.InventoryClaimResponse;
+import com.ecom.orderservice.dto.InventoryResponse;
 import com.ecom.orderservice.dto.OrderLineItemRequest;
 import com.ecom.orderservice.dto.OrderLineItemResponse;
 import com.ecom.orderservice.dto.OrderRequest;
@@ -23,6 +24,7 @@ import com.ecom.orderservice.model.OrderLineItem;
 import com.ecom.orderservice.model.OrderPaymentStatus;
 import com.ecom.orderservice.model.OrderStatus;
 import com.ecom.orderservice.repository.OrderRepository;
+import com.ecom.orderservice.utils.IDGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -64,10 +66,12 @@ public class OrderService {
     private final WebClient webClient;
     // private final SqsClient sqsClient;
     private final SqsAsyncClient sqsClient;
-    
+    private final IDGenerator idGenerator;
+
     public OrderResponse createOrder(OrderRequest orderRequest){
 
         Order order=new Order();
+        order.setId(idGenerator.next());
         order.setOrderNumber(UUID.randomUUID().toString());
         order.setTotalAmount(new BigDecimal(0));
 
@@ -88,7 +92,7 @@ public class OrderService {
         for(OrderLineItem orderLineItem: orderLineItems){
             InventoryClaimRequest inventoryClaimRequest=InventoryClaimRequest.builder().quantity(orderLineItem.getQuantity()).build();
             InventoryClaimResponse inventoryClaimResponse=webClient.post()
-            .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getProductId()+"/claim")
+            .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getInventoryId()+"/claim")
             .bodyValue(inventoryClaimRequest)
             .retrieve()
             .bodyToMono(InventoryClaimResponse.class)
@@ -103,7 +107,7 @@ public class OrderService {
 
         for(OrderLineItem orderLineItem: orderLineItems){
             webClient.patch()
-                .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getProductId()+"/claim/"+orderLineItem.getInventoryClaimId())
+                .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getInventoryId()+"/claim/"+orderLineItem.getInventoryClaimId())
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -113,11 +117,8 @@ public class OrderService {
 
     @Transactional
     public OrderResponse getOrder(Long orderId){
-        // Order order=orderRepository.findById(orderId).get();
-        System.out.println("hello, hot reloading!");
-        // return orderResponseFrom(order);
-        return orderResponseFrom(new Order(11l, "xx", 
-        new ArrayList<>(), new BigDecimal(0), OrderStatus.OrderStatusCreated, OrderPaymentStatus.OrderPaymentStatusCompleted));
+        Order order=orderRepository.findById(orderId).get();
+        return orderResponseFrom(order);
     }
 
 
@@ -206,9 +207,14 @@ public class OrderService {
 
     private OrderLineItem orderLineItemFrom(OrderLineItemRequest orderLineItemRequest, Order order){
         
+        InventoryResponse inventoryResponse= webClient.get()
+                .uri("http://inventory-service:30002/api/inventories/"+orderLineItemRequest.getInventoryId())
+                .retrieve()
+                .bodyToMono(InventoryResponse.class)
+                .block();
         
         Product product=webClient.get()
-            .uri("http://product-service:30001/api/products/"+orderLineItemRequest.getProductId())
+            .uri("http://product-service:30001/api/products/"+inventoryResponse.getProductId())
             .retrieve()
             .bodyToMono(Product.class)
             .block();
@@ -218,13 +224,14 @@ public class OrderService {
         
         BigDecimal lineItemTotal=product.getPrice().multiply(BigDecimal.valueOf(orderLineItemRequest.getQuantity()));
 
+        orderLineItem.setId(idGenerator.next());
         orderLineItem.setTotalAmount(lineItemTotal);
         orderLineItem.setQuantity(orderLineItemRequest.getQuantity());
         orderLineItem.setSkuCode("NA");
        
         orderLineItem.setOrder(order);
 
-        orderLineItem.setProductId(orderLineItemRequest.getProductId());
+        orderLineItem.setInventoryId(orderLineItemRequest.getInventoryId());
         
         order.setTotalAmount(lineItemTotal.add(order.getTotalAmount()));
 
@@ -234,12 +241,16 @@ public class OrderService {
 
     private OrderLineItemResponse orderLineItemResponseFrom(OrderLineItem orderLineItem){
         OrderLineItemResponse orderLineItemResponse=new OrderLineItemResponse();
-
+        InventoryResponse inventoryResponse= webClient.get()
+                .uri("http://inventory-service:30002/api/inventories/"+orderLineItem.getInventoryId())
+                .retrieve()
+                .bodyToMono(InventoryResponse.class)
+                .block();
         orderLineItemResponse.setId(orderLineItem.getId());
         orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount());
         orderLineItemResponse.setQuantity(orderLineItem.getQuantity());
         orderLineItemResponse.setSkuCode(orderLineItem.getSkuCode());
-        orderLineItemResponse.setProductId(orderLineItem.getProductId());
+        orderLineItemResponse.setProductId(inventoryResponse.getProductId());
 
         return orderLineItemResponse;
 

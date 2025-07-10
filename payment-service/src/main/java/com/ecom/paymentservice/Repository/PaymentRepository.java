@@ -12,7 +12,7 @@ import com.ecom.paymentservice.model.Payment;
 import jakarta.persistence.LockModeType;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Integer> {
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @NonNull Optional<Payment> findById(@NonNull Integer id);
+    @NonNull Optional<Payment> findById(@NonNull Long id);
 }

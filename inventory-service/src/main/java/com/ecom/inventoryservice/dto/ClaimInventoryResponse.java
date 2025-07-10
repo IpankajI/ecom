@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClaimInventoryResponse {
-    private String claimId;
+    private Long claimId;
 }

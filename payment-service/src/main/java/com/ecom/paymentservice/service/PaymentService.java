@@ -14,6 +14,7 @@ import com.ecom.paymentservice.dto.PaymentResponse;
 import com.ecom.paymentservice.model.Payment;
 import com.ecom.paymentservice.model.PaymentEvent;
 import com.ecom.paymentservice.model.PaymentStatus;
+import com.ecom.paymentservice.utils.IDGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,6 +33,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final WebClient webClient;
     private final SqsClient sqsClient;
+    private final IDGenerator idGenerator;
 
     public PaymentResponse initiatePayment(PaymentRequest paymentRequest){
         OrderResponse orderResponse=webClient
@@ -47,6 +49,7 @@ public class PaymentService {
 
         LocalDateTime now=LocalDateTime.now();
         Payment payment=Payment.builder()
+            .id(idGenerator.next())
             .createdAt(now)
             .orderId(paymentRequest.getOrderId())
             .paymentMode(paymentRequest.getPaymentMode())
@@ -55,21 +58,20 @@ public class PaymentService {
             .build();
 
         paymentRepository.save(payment);
-        PaymentResponse paymentResponse=PaymentResponseFrom(payment);
+        PaymentResponse paymentResponse=paymentResponseFrom(payment);
         sendPaymentEvent(paymentResponse);
-
         return paymentResponse;
     }
 
     @Transactional
-    public PaymentResponse getPayment(Integer paymentId){
+    public PaymentResponse getPayment(Long paymentId){
         Payment payment=paymentRepository.findById(paymentId).get();
-        return PaymentResponseFrom(payment);
+        return paymentResponseFrom(payment);
     }
 
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public PaymentResponse updateStatus(Integer paymentId, PaymentStatus paymentStatus){
+    public PaymentResponse updateStatus(Long paymentId, PaymentStatus paymentStatus){
 
         Payment payment=paymentRepository.findById(paymentId).get();
 
@@ -79,7 +81,7 @@ public class PaymentService {
 
         payment.setPaymentStatus(paymentStatus);
         paymentRepository.save(payment);
-        PaymentResponse paymentResponse=PaymentResponseFrom(payment);
+        PaymentResponse paymentResponse=paymentResponseFrom(payment);
 
         sendPaymentEvent(paymentResponse);
 
@@ -151,7 +153,7 @@ public class PaymentService {
         return false;
     }
 
-    private PaymentResponse PaymentResponseFrom(Payment payment){
+    private PaymentResponse paymentResponseFrom(Payment payment){
         PaymentResponse paymentResponse=PaymentResponse.builder()
             .createdAt(payment.getCreatedAt())
             .id(payment.getId())
@@ -166,7 +168,7 @@ public class PaymentService {
 
 @Data
 class OrderResponse {
-    private Integer id;
+    private Long id;
     private String orderNumber;
     private BigDecimal totalAmount;
     private String paymentStatus;

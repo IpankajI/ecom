@@ -48,7 +48,7 @@ public class InventoryClaimExpired {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public void reclaimExpiredInventory(long inventoryId, String operationId){
+    public void reclaimExpiredInventory(long inventoryId, long operationId){
 
         // get lock on inventory
         Inventory inventory=inventoryRepository.findById(inventoryId).get();

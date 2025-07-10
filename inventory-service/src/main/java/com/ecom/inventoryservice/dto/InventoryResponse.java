@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class InventoryResponse {
+    private Long id;
     private String skuCode;
     private Integer quantity;
     private String productId;

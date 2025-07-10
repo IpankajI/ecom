@@ -23,7 +23,6 @@ import lombok.Setter;
 public class OrderLineItem {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String skuCode;
     private BigDecimal totalAmount;
@@ -31,6 +30,6 @@ public class OrderLineItem {
     @ManyToOne
     private Order order;
     @Column(nullable = false)
-    private String productId;
-    private String inventoryClaimId;
+    private Long inventoryId;
+    private Long inventoryClaimId;
 }

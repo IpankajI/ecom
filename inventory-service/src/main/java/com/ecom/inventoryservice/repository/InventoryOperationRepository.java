@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.ecom.inventoryservice.model.InventoryOperation;
 
-public interface InventoryOperationRepository extends JpaRepository<InventoryOperation, String> {
+public interface InventoryOperationRepository extends JpaRepository<InventoryOperation, Long> {
     InventoryOperation getByInventoryId(Long inventoryId);
 
     @Query(value = "select * from inventory_operations where inventory_operation_status = ?1 and inventory_operation_type = ?2 order by updated_at limit ?3", nativeQuery = true)

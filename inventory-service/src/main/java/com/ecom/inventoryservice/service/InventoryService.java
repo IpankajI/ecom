@@ -20,6 +20,7 @@ import com.ecom.inventoryservice.model.InventoryOperationStatus;
 import com.ecom.inventoryservice.model.InventoryOperationType;
 import com.ecom.inventoryservice.repository.InventoryOperationRepository;
 import com.ecom.inventoryservice.repository.InventoryRepository;
+import com.ecom.inventoryservice.utils.IDGenerator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,7 @@ public class InventoryService {
     private final InventoryOperationRepository inventoryOperationRepository;
     private final WebClient webClient;
     private final AppConfig appConfig;
+    private final IDGenerator idGenerator;
 
     public boolean isInStock(String skuCode){
 
@@ -43,9 +45,9 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public Inventory getInventory(String productId){
+    public Inventory getInventory(Long id){
 
-        Inventory inventory=inventoryRepository.getByProductId(productId);
+        Inventory inventory=inventoryRepository.findById(id).get();
 
         return inventory;
     }
@@ -56,7 +58,7 @@ public class InventoryService {
     }
 
 
-    public void addInventory(Inventory inventory){
+    public Inventory addInventory(Inventory inventory){
 
         ProductResponse product=webClient
             .get()
@@ -68,15 +70,17 @@ public class InventoryService {
         if(product==null || !product.getId().equals(inventory.getProductId())){
             throw new RuntimeException("no such product available");
         }
+        inventory.setId(idGenerator.next());
+        inventory.setStoreId(0l);
 
-        inventoryRepository.save(inventory);
+        return inventoryRepository.save(inventory);
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public void incrementQuantityBy(String productId , Integer incBy){
+    public void incrementQuantityBy(Long id , Integer incBy){
         // also take lock on inventory record
 
-        Inventory inventory=inventoryRepository.getByProductId(productId);
+        Inventory inventory=inventoryRepository.findById(id).get();
         if(inventory==null){
             throw new RuntimeException("no such product");
         }
@@ -87,11 +91,12 @@ public class InventoryService {
         LocalDateTime now=LocalDateTime.now();
 
         InventoryOperation inventoryOperation=InventoryOperation.builder()
+                        .operationId(idGenerator.next())
                         .createAt(now)
                         .inventoryId(inventory.getId())
                         .inventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusCompleted)
                         .inventoryOperationType(InventoryOperationType.InventoryOperationTypeAdd)
-                        .operationId(UUID.randomUUID().toString())
+                        .operationId(idGenerator.next())
                         .quantity(incBy)
                         .updatedAt(now)
                         .build();
@@ -99,12 +104,12 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public ClaimInventoryResponse claimInventory(String productId, Integer quanity){
+    public ClaimInventoryResponse claimInventory(Long id, Integer quanity){
         if(quanity<=0){
             throw new RuntimeException("claim quanity should be positive");
         }
         // also take lock on inventory record
-        Inventory inventory=inventoryRepository.getByProductId(productId);
+        Inventory inventory=inventoryRepository.findById(id).get();
         if(inventory==null){
             throw new RuntimeException("no such product");
         }
@@ -123,7 +128,7 @@ public class InventoryService {
                         .inventoryId(inventory.getId())
                         .inventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusInitiated)
                         .inventoryOperationType(InventoryOperationType.InventoryOperationTypeClaim)
-                        .operationId(UUID.randomUUID().toString())
+                        .operationId(idGenerator.next())
                         .quantity(quanity)
                         .updatedAt(now)
                         .build();
@@ -140,7 +145,7 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public void markInventoryClaimSold(String operationId){
+    public void markInventoryClaimSold(long operationId){
         InventoryOperation inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){
             throw new RuntimeException("no such claim");

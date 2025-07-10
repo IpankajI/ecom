@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecom.inventoryservice.dto.ClaimInventoryRequest;
@@ -41,21 +40,19 @@ public class InventoryController {
     }
 
     @PostMapping
-    public void addInventory(@RequestBody InventoryRequest inventoryRequest){
+    public InventoryResponse addInventory(@RequestBody InventoryRequest inventoryRequest){
         Inventory inventory=Inventory.builder()
                     .productId(inventoryRequest.getProductId())
                     .quantity(0)
                     .skuCode(inventoryRequest.getSkuCode())
                     .build();
-        inventoryService.addInventory(inventory);
+        return InventoryResponseFrom(inventoryService.addInventory(inventory));
     }
 
-    @GetMapping("/{productId}")
-    public InventoryResponse getInventory(@PathVariable("productId") String productId){
+    @GetMapping("/{id}")
+    public InventoryResponse getInventory(@PathVariable("id") Long id){
 
-
-        Inventory inventory=inventoryService.getInventory(productId);
-
+        Inventory inventory=inventoryService.getInventory(id);
         if(inventory==null){
             throw new RuntimeException("no such inventory");
         }
@@ -65,26 +62,26 @@ public class InventoryController {
 
 
     private InventoryResponse InventoryResponseFrom(Inventory inventory){
-
         return InventoryResponse.builder()
+            .id(inventory.getId())
             .skuCode(inventory.getSkuCode())
             .productId(inventory.getProductId())
             .quantity(inventory.getQuantity())
             .build();
     }
 
-    @PatchMapping("/{productId}")
-    public void incrementInventoryQuantity(@PathVariable("productId") String productId, @RequestBody IncrementInventoryQuantityRequest incrementInventoryQuantityRequest ){
-        inventoryService.incrementQuantityBy(productId, incrementInventoryQuantityRequest.getIncBy());
+    @PatchMapping("/{id}")
+    public void incrementInventoryQuantity(@PathVariable("id") Long id, @RequestBody IncrementInventoryQuantityRequest incrementInventoryQuantityRequest ){
+        inventoryService.incrementQuantityBy(id, incrementInventoryQuantityRequest.getIncBy());
     }
 
-    @PostMapping("/{productId}/claim")
-    public ClaimInventoryResponse claimInventoryQuantity(@PathVariable("productId") String productId, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
-        return inventoryService.claimInventory(productId, claimInventoryRequest.getQuantity());
+    @PostMapping("/{id}/claim")
+    public ClaimInventoryResponse claimInventoryQuantity(@PathVariable("id") Long id, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
+        return inventoryService.claimInventory(id, claimInventoryRequest.getQuantity());
     }
 
-    @PatchMapping("/{productId}/claim/{claim_id}")
-    public void markClaimCompleted(@PathVariable("claim_id") String claimId){
+    @PatchMapping("/{id}/claim/{claim_id}")
+    public void markClaimCompleted(@PathVariable("claim_id") Long claimId){
         inventoryService.markInventoryClaimSold(claimId);
     }
 

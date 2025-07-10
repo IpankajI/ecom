@@ -1,20 +1,19 @@
 package com.ecom.orderservice.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderLineItemResponse {
+@Getter
+@Setter
+@Builder
+public class InventoryResponse {
     private Long id;
     private String skuCode;
-    private BigDecimal totalAmount;
-    private Integer quantity;   
-    private Long inventoryId;
+    private Integer quantity;
     private String productId;
 }

@@ -1,6 +1,7 @@
 package com.ecom.productservice.service;
 
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,6 @@ public class ProductService {
             .build();
 
         productRepository.save(product);
-
         log.info("product with id: {} created", product.getId());
     }
     

@@ -22,8 +22,7 @@ import lombok.Setter;
 public class AppUser {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String phoneNumber;
     private String name;
     private String password;

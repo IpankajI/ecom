@@ -9,5 +9,5 @@ import lombok.Data;
 @Builder
 public class PaymentRequest {
     private PaymentMode paymentMode;
-    private String orderId;
+    private Long orderId;
 }

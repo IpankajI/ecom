@@ -35,12 +35,12 @@ public class PaymentController {
     }
 
     @GetMapping("/{paymentId}")
-    public PaymentResponse getPayment(@PathVariable("paymentId") Integer paymentId){
+    public PaymentResponse getPayment(@PathVariable("paymentId") Long paymentId){
         return paymentService.getPayment(paymentId);
     }
 
     @PatchMapping("/{paymentId}/status")
-    public PaymentResponse updatePaymentStatus(@PathVariable("paymentId") Integer paymentId, @RequestBody UpdatePaymentStatusRequest updatePaymentStatusRequest){
+    public PaymentResponse updatePaymentStatus(@PathVariable("paymentId") Long paymentId, @RequestBody UpdatePaymentStatusRequest updatePaymentStatusRequest){
         PaymentResponse paymentResponse=paymentService.updateStatus(paymentId, updatePaymentStatusRequest.getPaymentStatus());
         return paymentResponse;
     }

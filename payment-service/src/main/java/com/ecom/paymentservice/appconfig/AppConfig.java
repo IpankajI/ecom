@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.ecom.paymentservice.utils.IDGenerator;
+import com.ecom.paymentservice.utils.IDGeneratorRandom;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -44,5 +47,10 @@ public class AppConfig {
         .build();
 
         return sqsClient;
+    }
+
+    @Bean
+    public IDGenerator idGenerator(){
+        return new IDGeneratorRandom();
     }
 }

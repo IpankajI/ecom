@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 @Builder
 public class PaymentEvent {
-    private Integer id;
-    private String orderId;
+    private Long id;
+    private Long orderId;
     private PaymentMode paymentMode;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;
