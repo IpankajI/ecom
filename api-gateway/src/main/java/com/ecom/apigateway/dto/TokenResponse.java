@@ -1,5 +1,7 @@
 package com.ecom.apigateway.dto;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenResponse {
+public class TokenResponse implements Serializable {
     @JsonProperty("access_token")
     private String accessToken;    
     @JsonProperty("refresh_token")

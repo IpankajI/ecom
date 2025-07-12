@@ -3,8 +3,8 @@ package com.ecom.inventoryservice.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -33,6 +33,7 @@ public class InventoryService {
     private final WebClient webClient;
     private final AppConfig appConfig;
     private final IDGenerator idGenerator;
+    private final Logger logger;
 
     public boolean isInStock(String skuCode){
 
@@ -46,15 +47,15 @@ public class InventoryService {
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Inventory getInventory(Long id){
-
-        Inventory inventory=inventoryRepository.findById(id).get();
-
-        return inventory;
+        Optional<Inventory> inventory=inventoryRepository.findById(id);
+        if(inventory.isPresent()){
+            return inventory.get();
+        }
+        return null;
     }
 
     public List<Inventory> getInventories(){
-        List<Inventory> inventories=inventoryRepository.findAll();
-        return inventories;
+        return inventoryRepository.findAll();
     }
 
 
@@ -68,7 +69,8 @@ public class InventoryService {
             .block();
 
         if(product==null || !product.getId().equals(inventory.getProductId())){
-            throw new RuntimeException("no such product available");
+            logger.error("no such product available");
+            return null;
         }
         inventory.setId(idGenerator.next());
         inventory.setStoreId(0l);
@@ -80,11 +82,12 @@ public class InventoryService {
     public void incrementQuantityBy(Long id , Integer incBy){
         // also take lock on inventory record
 
-        Inventory inventory=inventoryRepository.findById(id).get();
-        if(inventory==null){
-            throw new RuntimeException("no such product");
+        Optional<Inventory> inventoryRecord=inventoryRepository.findById(id);
+        if(inventoryRecord.isEmpty()){
+            logger.error("no such product");
+            return;
         }
-
+        Inventory inventory=inventoryRecord.get();
         inventory.setQuantity(inventory.getQuantity()+incBy);
         inventoryRepository.save(inventory);
 
@@ -94,8 +97,8 @@ public class InventoryService {
                         .operationId(idGenerator.next())
                         .createAt(now)
                         .inventoryId(inventory.getId())
-                        .inventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusCompleted)
-                        .inventoryOperationType(InventoryOperationType.InventoryOperationTypeAdd)
+                        .inventoryOperationStatus(InventoryOperationStatus.INVENTORY_OPERATION_STATUS_COMPLETED)
+                        .inventoryOperationType(InventoryOperationType.INVENTORY_OPERATION_TYPE_ADD)
                         .operationId(idGenerator.next())
                         .quantity(incBy)
                         .updatedAt(now)
@@ -106,16 +109,19 @@ public class InventoryService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public ClaimInventoryResponse claimInventory(Long id, Integer quanity){
         if(quanity<=0){
-            throw new RuntimeException("claim quanity should be positive");
+            logger.error("claim quanity should be positive");
+            return null;
         }
         // also take lock on inventory record
-        Inventory inventory=inventoryRepository.findById(id).get();
-        if(inventory==null){
-            throw new RuntimeException("no such product");
+        Optional<Inventory> inventoryRecord=inventoryRepository.findById(id);
+        if(!inventoryRecord.isPresent()){
+            logger.error("no such product");
+            return null;
         }
-
+        Inventory inventory=inventoryRecord.get();
         if(inventory.getQuantity()<quanity){
-            throw new RuntimeException("not enough stock");
+            logger.error("not enough stock");
+            return null;
         }
 
         inventory.setQuantity(inventory.getQuantity()-quanity);
@@ -126,54 +132,56 @@ public class InventoryService {
         InventoryOperation inventoryOperation=InventoryOperation.builder()
                         .createAt(now)
                         .inventoryId(inventory.getId())
-                        .inventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusInitiated)
-                        .inventoryOperationType(InventoryOperationType.InventoryOperationTypeClaim)
+                        .inventoryOperationStatus(InventoryOperationStatus.INVENTORY_OPERATION_STATUS_INITIATED)
+                        .inventoryOperationType(InventoryOperationType.INVENTORY_OPERATION_TYPE_CLAIM)
                         .operationId(idGenerator.next())
                         .quantity(quanity)
                         .updatedAt(now)
                         .build();
         inventoryOperation=inventoryOperationRepository.save(inventoryOperation);
 
-        ClaimInventoryResponse claimInventoryResponse=ClaimInventoryResponseFrom(inventoryOperation);
-
-        return claimInventoryResponse;
+        return claimInventoryResponseFrom(inventoryOperation);
     }
 
-    private ClaimInventoryResponse ClaimInventoryResponseFrom(InventoryOperation inventoryOperation){
-        ClaimInventoryResponse claimInventoryResponse=new ClaimInventoryResponse(inventoryOperation.getOperationId());
-        return claimInventoryResponse;
+    private ClaimInventoryResponse claimInventoryResponseFrom(InventoryOperation inventoryOperation){
+        return new ClaimInventoryResponse(inventoryOperation.getOperationId());
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void markInventoryClaimSold(long operationId){
         InventoryOperation inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){
-            throw new RuntimeException("no such claim");
+            logger.error("no such claim");
+            return;
         }
-        if(inventoryOperation.getInventoryOperationStatus()==InventoryOperationStatus.InventoryOperationStatusCompleted){
+        if(inventoryOperation.getInventoryOperationStatus()==InventoryOperationStatus.INVENTORY_OPERATION_STATUS_COMPLETED){
             return;
         }
         // also take lock on inventory record
         Inventory inventory=inventoryRepository.findById((long)inventoryOperation.getInventoryId()).get();
         if(inventory==null){
-            throw new RuntimeException("inventory not found");
+            logger.error("inventory not found");
+            return;
         }
         //fetch again to respect the lock
         inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){
-            throw new RuntimeException("no such claim");
+            logger.error("no such claim");
+            return;
         }
 
-        if(inventoryOperation.getInventoryOperationType()!=InventoryOperationType.InventoryOperationTypeClaim
-            || inventoryOperation.getInventoryOperationStatus()!=InventoryOperationStatus.InventoryOperationStatusInitiated){
-            throw new RuntimeException("invalid operation for op id: "+operationId);
+        if(inventoryOperation.getInventoryOperationType()!=InventoryOperationType.INVENTORY_OPERATION_TYPE_CLAIM
+            || inventoryOperation.getInventoryOperationStatus()!=InventoryOperationStatus.INVENTORY_OPERATION_STATUS_INITIATED){
+            logger.error("invalid operation for op id: {}", operationId);
+            return;
         }
 
         if(inventoryOperation.getCreateAt().isBefore(LocalDateTime.now().minusMinutes(appConfig.inventoryClaimExpiryInMinutes))){
-            throw new RuntimeException("claim expired for op id: "+operationId);
+            logger.error("claim expired for op id: {}",operationId);
+            return;
         }
 
-        inventoryOperation.setInventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusCompleted);   
+        inventoryOperation.setInventoryOperationStatus(InventoryOperationStatus.INVENTORY_OPERATION_STATUS_COMPLETED);   
         
         inventoryOperationRepository.save(inventoryOperation);
 

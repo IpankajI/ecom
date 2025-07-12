@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS public.orders
     status character varying(255) COLLATE pg_catalog."default",
     total_amount numeric(38,2),
     CONSTRAINT orders_pkey PRIMARY KEY (id),
-    CONSTRAINT orders_payment_status_check CHECK (payment_status::text = ANY (ARRAY['OrderPaymentStatusPending'::character varying, 'OrderPaymentStatusInitiated'::character varying, 'OrderPaymentStatusCompleted'::character varying, 'OrderPaymentStatusFailed'::character varying, 'OrderPaymentStatusRefundInitiated'::character varying, 'OrderPaymentStatusRefunded'::character varying]::text[])),
-    CONSTRAINT orders_status_check CHECK (status::text = ANY (ARRAY['OrderStatusCreated'::character varying, 'OrderStatusCancelled'::character varying, 'OrderStatusComplete'::character varying]::text[]))
+    CONSTRAINT orders_payment_status_check CHECK (payment_status::text = ANY (ARRAY['ORDER_PAYMENT_STATUS_PENDING'::character varying, 'ORDER_PAYMENT_STATUS_INITIATED'::character varying, 'ORDER_PAYMENT_STATUS_COMPLETED'::character varying, 'ORDER_PAYMENT_STATUS_FAILED'::character varying, 'ORDER_PAYMENT_STATUS_REFUND_INITIATED'::character varying, 'ORDER_PAYMENT_STATUS_REFUNDED'::character varying]::text[])),
+    CONSTRAINT orders_status_check CHECK (status::text = ANY (ARRAY['ORDER_STATUS_CREATED'::character varying, 'ORDER_STATUS_CANCELLED'::character varying, 'ORDER_STATUS_COMPLETE'::character varying]::text[]))
 )
 
 TABLESPACE pg_default;

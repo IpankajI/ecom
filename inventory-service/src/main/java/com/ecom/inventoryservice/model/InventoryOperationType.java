@@ -1,8 +1,8 @@
 package com.ecom.inventoryservice.model;
 
 public enum InventoryOperationType {
-    InventoryOperationTypeAdd(1000),
-    InventoryOperationTypeClaim(20000);
+    INVENTORY_OPERATION_TYPE_ADD(1000),
+    INVENTORY_OPERATION_TYPE_CLAIM(20000);
 
 
     private final int value;
@@ -15,3 +15,6 @@ public enum InventoryOperationType {
         return value;
     }
 }
+
+
+

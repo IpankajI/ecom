@@ -8,9 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.ecom.apigateway.security.apikey.ProviderApiKey;
 import com.ecom.apigateway.security.jwt.ProviderJwt;
 import com.ecom.apigateway.security.otp.ProviderOtp;
@@ -28,7 +25,7 @@ public class Configurer{
     private final ProviderOtp authProviderOtp;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
         return new ProviderManager(
                 Arrays.asList(
                     authProviderUP, 

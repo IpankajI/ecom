@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS public.inventory_operations
     quantity integer,
     updated_at timestamp(6) without time zone,
     CONSTRAINT inventory_operations_pkey PRIMARY KEY (operation_id),
-    CONSTRAINT inventory_operations_inventory_operation_status_check CHECK (inventory_operation_status::text = ANY (ARRAY['InventoryOperationStatusInitiated'::character varying, 'InventoryOperationStatusCompleted'::character varying, 'InventoryOperationStatusExpired'::character varying]::text[])),
-    CONSTRAINT inventory_operations_inventory_operation_type_check CHECK (inventory_operation_type::text = ANY (ARRAY['InventoryOperationTypeAdd'::character varying, 'InventoryOperationTypeClaim'::character varying]::text[]))
+    CONSTRAINT inventory_operations_inventory_operation_status_check CHECK (inventory_operation_status::text = ANY (ARRAY['INVENTORY_OPERATION_STATUS_INITIATED'::character varying, 'INVENTORY_OPERATION_STATUS_COMPLETED'::character varying, 'INVENTORY_OPERATION_STATUS_EXPIRED'::character varying]::text[])),
+    CONSTRAINT inventory_operations_inventory_operation_type_check CHECK (inventory_operation_type::text = ANY (ARRAY['INVENTORY_OPERATION_TYPE_ADD'::character varying, 'INVENTORY_OPERATION_TYPE_CLAIM'::character varying]::text[]))
 )
 
 TABLESPACE pg_default;

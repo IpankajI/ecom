@@ -1,8 +1,10 @@
 package com.ecom.productservice.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.ecom.productservice.dto.ProductRequest;
@@ -20,6 +22,7 @@ public class ProductService {
 
 
     private final ProductRepository productRepository;
+    private final Logger logger;
 
     public void addProduct(ProductRequest productRequest){
         Product product= Product.builder()
@@ -36,29 +39,26 @@ public class ProductService {
     public List<ProductResponse> getProducts(){
         List<Product> products=productRepository.findAll();
 
-        List<ProductResponse> productResponses = products.stream().map(product -> ProductResponseFrom(product)).toList();
-
-        return productResponses;
+        return products.stream().map(this::productResponseFrom).toList();
     }
 
     public ProductResponse getProduct(String productId){
-        Product product=productRepository.findById(productId).get();
+        Optional<Product> product=productRepository.findById(productId);
 
-        if(product==null){
-            throw new RuntimeException("no such product");
+        if(!product.isPresent()){
+            logger.error("no such product");
+            return null;
         }
  
-        return ProductResponseFrom(product);
+        return productResponseFrom(product.get());
     }
 
-    private ProductResponse ProductResponseFrom(Product product){
-        ProductResponse productResponse=ProductResponse.builder()
+    private ProductResponse productResponseFrom(Product product){
+        return ProductResponse.builder()
             .description(product.getDescription())
             .id(product.getId())
             .name(product.getName())
             .price(product.getPrice())
             .build();
-
-        return productResponse;
     }
 }

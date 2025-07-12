@@ -10,15 +10,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    
-    final private WebClient webClient;
-
+    private final WebClient webClient;
     public AppUser getUser(String username){
-        AppUser appUser=webClient.get().uri("http://user-service:30004/api/users/"+username)
+        return webClient.get().uri("http://user-service:30004/api/users/"+username)
                             .retrieve()
                             .bodyToMono(AppUser.class)
                             .block();
-        return appUser;
     }
 
 }

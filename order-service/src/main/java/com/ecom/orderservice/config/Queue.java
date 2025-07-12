@@ -2,9 +2,11 @@ package com.ecom.orderservice.config;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -12,13 +14,13 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 @Component
+@RequiredArgsConstructor
 public class Queue {
-    
+    private final Logger logger;
+
     @Bean
     public SqsClient sqsClient(){
         String endpoint = "http://queue:4566";
-        // String endpoint = "http://localhost:9325/";
-        // String region = "elasticmq";
         String accessKey = "x";
         String secretKey = "x";
         URI uri=null;
@@ -26,26 +28,21 @@ public class Queue {
             uri=new URI(endpoint);
         }
         catch(Exception e){
-            System.out.println("endpoint error: "+e.getStackTrace());
+            logger.error("{}",e.getMessage());
         }
 
-        SqsClient sqsClient=SqsClient.builder()
+        return SqsClient.builder()
             .credentialsProvider(StaticCredentialsProvider
                     .create(AwsBasicCredentials
                         .create(accessKey, secretKey)))
             .endpointOverride(uri)
             .region(Region.US_EAST_1)
         .build();
-
-
-        return sqsClient;
     }
 
     @Bean
     public SqsAsyncClient sqsAsyncClient(){
         String endpoint = "http://queue:4566";
-        // String endpoint = "http://localhost:9325/";
-        // String region = "elasticmq";
         String accessKey = "x";
         String secretKey = "x";
         URI uri=null;
@@ -53,11 +50,10 @@ public class Queue {
             uri=new URI(endpoint);
         }
         catch(Exception e){
-            System.out.println("endpoint error: "+e.getStackTrace());
+            logger.error("{}",e.getMessage());
         }
 
-
-        SqsAsyncClient sqsAsyncClient=SqsAsyncClient.builder()
+        return SqsAsyncClient.builder()
             .credentialsProvider(StaticCredentialsProvider
                     .create(AwsBasicCredentials
                         .create(accessKey, secretKey)))
@@ -65,6 +61,5 @@ public class Queue {
             .region(Region.US_EAST_1)
         .build();
 
-        return sqsAsyncClient;
     }
 }

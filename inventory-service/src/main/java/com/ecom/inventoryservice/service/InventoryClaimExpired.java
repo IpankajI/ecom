@@ -4,8 +4,7 @@ package com.ecom.inventoryservice.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
@@ -29,46 +28,50 @@ public class InventoryClaimExpired {
     private final InventoryOperationRepository inventoryOperationRepository;
     private final InventoryRepository inventoryRepository;
     private final AppConfig appConfig;
+    private final Logger logger;
 
     @Scheduled(cron = "*/10 * * * * *")
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void run(){
 
-        List<InventoryOperation> ops=inventoryOperationRepository.findAllExpiredInventory(InventoryOperationStatus.InventoryOperationStatusInitiated.name(), 
-                                InventoryOperationType.InventoryOperationTypeClaim.name(), 10_000);
+        List<InventoryOperation> ops=inventoryOperationRepository.findAllExpiredInventory(InventoryOperationStatus.INVENTORY_OPERATION_STATUS_INITIATED.name(), 
+                                InventoryOperationType.INVENTORY_OPERATION_TYPE_CLAIM.name(), 10_000);
 
         for(InventoryOperation inventoryOperation:ops){
             try {
                 reclaimExpiredInventory(inventoryOperation.getInventoryId(), inventoryOperation.getOperationId());
             } catch (Exception e) {
-                System.out.println("...... "+e.getMessage());
+                logger.error(e.getMessage());
             }
         }
 
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+    // @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void reclaimExpiredInventory(long inventoryId, long operationId){
 
         // get lock on inventory
         Inventory inventory=inventoryRepository.findById(inventoryId).get();
         if(inventory==null){
-            throw new RuntimeException("inventory not found");
+            logger.error("inventory not found");
+            return;
         }
         InventoryOperation inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){
-            throw new RuntimeException("no such operation with id: "+operationId);
+            logger.error("no such operation with id: {}",operationId);
+            return;
         }
-        if(inventoryOperation.getInventoryOperationType()!=InventoryOperationType.InventoryOperationTypeClaim
-            || inventoryOperation.getInventoryOperationStatus()!=InventoryOperationStatus.InventoryOperationStatusInitiated){
-            throw new RuntimeException("invalid operation");
+        if(inventoryOperation.getInventoryOperationType()!=InventoryOperationType.INVENTORY_OPERATION_TYPE_CLAIM
+            || inventoryOperation.getInventoryOperationStatus()!=InventoryOperationStatus.INVENTORY_OPERATION_STATUS_INITIATED){
+            logger.error("invalid operation");
+            return;
         }
         if(!inventoryOperation.getCreateAt().isBefore(LocalDateTime.now().minusMinutes(appConfig.inventoryClaimExpiryInMinutes))){
             return;
         }
 
         // claim expired
-        inventoryOperation.setInventoryOperationStatus(InventoryOperationStatus.InventoryOperationStatusExpired);
+        inventoryOperation.setInventoryOperationStatus(InventoryOperationStatus.INVENTORY_OPERATION_STATUS_EXPIRED);
         inventory.setQuantity(inventory.getQuantity()+inventoryOperation.getQuantity());
 
         inventoryOperationRepository.save(inventoryOperation);
@@ -76,14 +79,3 @@ public class InventoryClaimExpired {
 
     }
 }
-
-
-
-// @Getter
-// class Product {
-//     private String id;
-//     private String name;
-//     private String description;
-//     private BigDecimal price;
-    
-// }

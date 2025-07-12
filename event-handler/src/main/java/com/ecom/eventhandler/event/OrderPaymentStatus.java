@@ -1,10 +1,10 @@
 package com.ecom.eventhandler.event;
 
 public enum OrderPaymentStatus {
-    OrderPaymentStatusPending,
-    OrderPaymentStatusInitiated,
-    OrderPaymentStatusCompleted,
-    OrderPaymentStatusFailed,
-    OrderPaymentStatusRefundInitiated,
-    OrderPaymentStatusRefunded
+    ORDER_PAYMENT_STATUS_PENDING,
+    ORDER_PAYMENT_STATUS_INITIATED,
+    ORDER_PAYMENT_STATUS_COMPLETED,
+    ORDER_PAYMENT_STATUS_FAILED,
+    ORDER_PAYMENT_STATUS_REFUND_INITIATED,
+    ORDER_PAYMENT_STATUS_REFUNDED
 }

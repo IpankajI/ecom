@@ -1,7 +1,7 @@
 package com.ecom.orderservice.model;
 
 public enum OrderStatus {
-    OrderStatusCreated,
-    OrderStatusCancelled,
-    OrderStatusComplete
+    ORDER_STATUS_CREATED,
+    ORDER_STATUS_CANCELLED,
+    ORDER_STATUS_COMPLETE
 }

@@ -31,28 +31,15 @@ public class ProviderJwt implements AuthenticationProvider{
         String subject;
         try {
             subject = jwtUtil.extractUserName(jwt);
-        } catch (JwtException e) {
-            return null;
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        } catch (InvalidKeySpecException e) {
+        } catch (JwtException|IllegalArgumentException|NoSuchAlgorithmException|InvalidKeySpecException e ) {
             return null;
         }
 
         try {
             if(!jwtUtil.isTokenValid(jwt, subject)){
-                System.out.println(".............token not valid");
                 return null;
             }
-        } catch (JwtException e) {
-            return null;
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        } catch (InvalidKeySpecException e) {
+        } catch (JwtException|IllegalArgumentException|NoSuchAlgorithmException|InvalidKeySpecException e) {
             return null;
         }
 

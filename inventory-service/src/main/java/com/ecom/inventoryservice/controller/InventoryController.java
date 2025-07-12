@@ -1,8 +1,9 @@
 package com.ecom.inventoryservice.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,16 +28,16 @@ import lombok.RequiredArgsConstructor;
 public class InventoryController {
     
     private final InventoryService inventoryService;
-
+    private final Logger logger;
 
     @GetMapping
     public List<InventoryResponse> getInventories(){
         List<Inventory> inventories=inventoryService.getInventories();
         if(inventories==null){
-            throw new RuntimeException("no inventory");
+            logger.error("no inventory");
+            return new ArrayList<>();
         }
-        List<InventoryResponse> inventoryResponses = inventories.stream().map(inventory -> InventoryResponseFrom(inventory)).toList();
-        return inventoryResponses;
+        return  inventories.stream().map(this::inventoryResponseFrom).toList();
     }
 
     @PostMapping
@@ -46,7 +47,7 @@ public class InventoryController {
                     .quantity(0)
                     .skuCode(inventoryRequest.getSkuCode())
                     .build();
-        return InventoryResponseFrom(inventoryService.addInventory(inventory));
+        return inventoryResponseFrom(inventoryService.addInventory(inventory));
     }
 
     @GetMapping("/{id}")
@@ -54,14 +55,16 @@ public class InventoryController {
 
         Inventory inventory=inventoryService.getInventory(id);
         if(inventory==null){
-            throw new RuntimeException("no such inventory");
+
+            logger.error("no such inventory");
+            return null;
         }
 
-        return InventoryResponseFrom(inventory);
+        return inventoryResponseFrom(inventory);
     }
 
 
-    private InventoryResponse InventoryResponseFrom(Inventory inventory){
+    private InventoryResponse inventoryResponseFrom(Inventory inventory){
         return InventoryResponse.builder()
             .id(inventory.getId())
             .skuCode(inventory.getSkuCode())
@@ -81,7 +84,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/{id}/claim/{claim_id}")
-    public void markClaimCompleted(@PathVariable("claim_id") Long claimId){
+    public void markClaimCompleted(@PathVariable("claim_id") Long claimId, @PathVariable("id") Long id){
         inventoryService.markInventoryClaimSold(claimId);
     }
 

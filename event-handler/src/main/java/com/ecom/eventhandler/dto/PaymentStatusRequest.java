@@ -12,5 +12,5 @@ public class PaymentStatusRequest {
 }
 
 // {
-//     "paymentStatus": "OrderPaymentStatusCompleted"
+//     "paymentStatus": "ORDER_PAYMENT_STATUS_COMPLETED"
 // }

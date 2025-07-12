@@ -30,8 +30,7 @@ public class PaymentController {
 
     @PostMapping("")
     public PaymentResponse createPayment(@RequestBody PaymentRequest paymentRequest){
-        PaymentResponse paymentResponse=paymentService.initiatePayment(paymentRequest);
-        return paymentResponse;
+        return paymentService.initiatePayment(paymentRequest);
     }
 
     @GetMapping("/{paymentId}")
@@ -41,7 +40,6 @@ public class PaymentController {
 
     @PatchMapping("/{paymentId}/status")
     public PaymentResponse updatePaymentStatus(@PathVariable("paymentId") Long paymentId, @RequestBody UpdatePaymentStatusRequest updatePaymentStatusRequest){
-        PaymentResponse paymentResponse=paymentService.updateStatus(paymentId, updatePaymentStatusRequest.getPaymentStatus());
-        return paymentResponse;
+        return paymentService.updateStatus(paymentId, updatePaymentStatusRequest.getPaymentStatus());
     }
 }

@@ -2,7 +2,7 @@ building an e-commerce plaform with java and spring.
 
 # Roadmap:
 - [x] set up project
-- [x] set up authentication and authorization 
+- [x] set up authentication and AUTHORIZATION 
 - [x] implement inventory and claim mechanism
 - [x] add payment service
 - [x] add async processing for payment and order status update
@@ -24,3 +24,10 @@ docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   localstack/localstack
 ```
+
+# sonarqube static code analysis command
+mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=ecom \
+  -Dsonar.projectName='ecom' \
+  -Dsonar.host.url=http://sonarqube:9000 \
+  -Dsonar.token=sqp_1512b34fa0a47d8dfbd1741d458d3b204e8fd6aa;

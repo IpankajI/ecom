@@ -30,35 +30,30 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponse createOrder(@RequestBody OrderRequest orderRequest){
-       OrderResponse orderResponse= orderService.createOrder(orderRequest);
-        return orderResponse;
+        return orderService.createOrder(orderRequest);
     }
 
     @GetMapping("/{order_id}")
     @ResponseStatus(HttpStatus.OK)
     public OrderResponse getOrder(@PathVariable("order_id") Long orderId){
-        OrderResponse orderResponse=orderService.getOrder(orderId);
-        return orderResponse;
+        return orderService.getOrder(orderId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<OrderResponse> getOrders(){
-        List<OrderResponse> orderResponse=orderService.getOrders();
-        return orderResponse;
+        return orderService.getOrders();
     }
 
     @PatchMapping("/{order_id}/paymentStatus")
     @ResponseStatus(HttpStatus.OK)
     public OrderResponse updatePaymentStatus(@PathVariable("order_id") Long orderId, @RequestBody OrderPaymentStatusRequest orderPaymentStatusRequest){
-        OrderResponse orderResponse=orderService.updateOrderPaymentStatus(orderId, orderPaymentStatusRequest.getPaymentStatus());
-        return orderResponse;
+        return orderService.updateOrderPaymentStatus(orderId, orderPaymentStatusRequest.getPaymentStatus());
     }
 
     @PatchMapping("/{order_id}/status")
     @ResponseStatus(HttpStatus.OK)
     public OrderResponse updateStatus(@PathVariable("order_id") Long orderId, @RequestBody OrderStatusRequest orderStatusRequest){
-        OrderResponse orderResponse=orderService.updateOrderStatus(orderId, orderStatusRequest.getStatus());
-        return orderResponse;
+        return orderService.updateOrderStatus(orderId, orderStatusRequest.getStatus());
     }
 }

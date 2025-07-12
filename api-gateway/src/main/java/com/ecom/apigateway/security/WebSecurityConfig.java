@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig{
-
     private final FilterOtp authFilterOtp;
     private final FilterJwt authFilterJwt;
     private final FilterUsernamePassword authFilterUP;

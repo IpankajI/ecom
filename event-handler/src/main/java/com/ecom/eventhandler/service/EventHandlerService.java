@@ -98,11 +98,11 @@ public class EventHandlerService {
 
         OrderPaymentStatus orderPaymentStatus=null;
         switch (paymentEvent.getPaymentStatus()) {
-            case PaymentStatusSuccess:
-                orderPaymentStatus=OrderPaymentStatus.OrderPaymentStatusCompleted;
+            case PAYMENT_STATUS_SUCCESS:
+                orderPaymentStatus=OrderPaymentStatus.ORDER_PAYMENT_STATUS_COMPLETED;
                 break;
-            case PaymentStatusInitiated:
-                orderPaymentStatus=OrderPaymentStatus.OrderPaymentStatusInitiated;
+            case PAYMENT_STATUS_INITIATED:
+                orderPaymentStatus=OrderPaymentStatus.ORDER_PAYMENT_STATUS_INITIATED;
                 break;
             default:
                 throw new RuntimeException("cannot update order status, invalid payment status");
@@ -114,7 +114,7 @@ public class EventHandlerService {
         String data=webClient.patch()
         .uri("http://order-service:30003/api/orders/"+paymentEvent.getOrderId()+"/paymentStatus")
         // .body(Mono.just(paymentStatusRequest), PaymentStatusRequest.class)
-        // .body(BodyInserters.fromFormData("paymentStatus", "OrderPaymentStatusCompleted"))
+        // .body(BodyInserters.fromFormData("paymentStatus", "ORDER_PAYMENT_STATUS_COMPLETED"))
         .bodyValue(paymentStatusRequest)
         .retrieve()
         .bodyToMono(String.class)

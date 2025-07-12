@@ -1,6 +1,6 @@
 package com.ecom.eventhandler.event;
 
 public enum PaymentMode {
-    PaymentModeCash,
-    PaymentModeUPI
+    PAYMENT_MODE_CASH,
+    PAYMENT_MODE_UPI
 }

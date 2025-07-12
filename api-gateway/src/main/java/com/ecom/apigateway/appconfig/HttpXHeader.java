@@ -1,12 +1,13 @@
 package com.ecom.apigateway.appconfig;
 
 public class HttpXHeader {
-    public static final String xPhoneNumber="phone-number";
-    public static final String xOtp="otp";
-    public static final String authorization="Authorization";
-    public static final String bearer="Bearer";
-    public static final String xApiKey="x-api-key";
-    public static final String xApiSecret="x-api-secret";
-    public static final String xUsername="username";
-    public static final String xPassword="password";
+    private HttpXHeader(){}
+    public static final String X_PHONE_NUMBER="phone-number";
+    public static final String X_OTP="otp";
+    public static final String AUTHORIZATION="AUTHORIZATION";
+    public static final String BEARER="BEARER";
+    public static final String X_API_KEY="x-api-key";
+    public static final String X_API_SECRET="x-api-secret";
+    public static final String X_USERNAME="username";
+    public static final String X_PASSWORD="password";
 }

@@ -14,22 +14,17 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class AuthenticationController {
-    
     private final OtpService otpService;
 
     @PostMapping("/login")
     public TokenResponse login(HttpServletRequest request){
-        String phoneNumber = request.getHeader(HttpXHeader.xPhoneNumber);
-        String otp = request.getHeader(HttpXHeader.xOtp);
-        TokenResponse tokenResponse=otpService.requestToken(phoneNumber, otp);
-        return tokenResponse;
+        return otpService.requestToken();
     }
 
     @PostMapping("/otp")
     public String requestOtp(HttpServletRequest request){
-        String phoneNumber = request.getHeader(HttpXHeader.xPhoneNumber);
-        String response=otpService.RequestOtp(phoneNumber);
-        return response;
+        String phoneNumber = request.getHeader(HttpXHeader.X_PHONE_NUMBER);
+        return otpService.requestOtp(phoneNumber);
     }
 
 }

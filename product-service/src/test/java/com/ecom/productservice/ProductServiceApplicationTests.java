@@ -51,7 +51,7 @@ class ProductServiceApplicationTests {
 						.content(productRequestContent))
 						.andExpect(MockMvcResultMatchers.status().isCreated());
 
-		Assert.assertTrue(productRepository.findAll().size()==1);
+		Assert.assertEquals(1, productRepository.findAll().size());
 	}
 
 	private ProductRequest getProductRequest(){

@@ -32,7 +32,6 @@ public class JwtUtil {
         KeyPair keyPair=keyPairGenerator.generateKeyPair();
         publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
         privateKey = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
-        System.out.println(".......public key: "+publicKey); 
     }
 
     int accessExpirationMs=9600000;
@@ -93,85 +92,3 @@ public class JwtUtil {
         
 
 }
-
-/* 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.stereotype.Component;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.KeyPair;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureAlgorithm;
-
-@Component
-public class JwtUtil {
-
-    public String generateToken(String subject) {
-        Map<String, Object> claims
-                = new HashMap<>();
-        return Jwts
-                .builder()
-                .claims()
-                .add(claims)
-                .subject(subject)
-                .issuer("NA")
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+ 60*10*1000))
-                .and()
-                .signWith(generateKey())
-                .compact();
-    }
-
-    private SecretKey generateKey() {
-        byte[] decode
-                = Decoders.BASE64.decode(getSecretKey());
-
-        return Keys.hmacShaKeyFor(decode);
-    }
-
-
-    public String getSecretKey() {
-        return "RqxPOuVfHoBA8Uq40MhJvfY6qEHOOWWvg6N9W9vt23s=";
-    }
-
-    public String extractUserName(String token) {
-        return extractClaims(token, Claims::getSubject);
-    }
-
-    private <T> T extractClaims(String token, Function<Claims,T> claimResolver) {
-        Claims claims = extractClaims(token);
-        return claimResolver.apply(claims);
-    }
-
-    private Claims extractClaims(String token) {
-        return Jwts
-                .parser()
-                .verifyWith(generateKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    public boolean isTokenValid(String token, String subject) {
-        final String userName = extractUserName(token);
-        return (userName.equals(subject) && !isTokenExpired(token));
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaims(token, Claims::getExpiration);
-    }
-}
-
-*/

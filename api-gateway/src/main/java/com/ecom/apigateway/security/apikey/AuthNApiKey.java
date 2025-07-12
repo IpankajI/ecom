@@ -40,7 +40,6 @@ public class AuthNApiKey implements Authentication{
 
     @Override
     public Object getDetails() {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getDetails'");
     }
 
@@ -56,7 +55,6 @@ public class AuthNApiKey implements Authentication{
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setAuthenticated'");
     }
     

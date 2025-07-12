@@ -1,9 +1,9 @@
 package com.ecom.inventoryservice.model;
 
 public enum InventoryOperationStatus {
-    InventoryOperationStatusInitiated(1000),
-    InventoryOperationStatusCompleted(2000),
-    InventoryOperationStatusExpired(3000);
+    INVENTORY_OPERATION_STATUS_INITIATED(1000),
+    INVENTORY_OPERATION_STATUS_COMPLETED(2000),
+    INVENTORY_OPERATION_STATUS_EXPIRED(3000);
 
     private final int value;
 
@@ -15,3 +15,6 @@ public enum InventoryOperationStatus {
         return value;
     }
 }
+
+
+

@@ -2,13 +2,15 @@ package com.ecom.paymentservice.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.ecom.paymentservice.Repository.PaymentRepository;
+import com.ecom.paymentservice.repository.PaymentRepository;
 import com.ecom.paymentservice.dto.PaymentRequest;
 import com.ecom.paymentservice.dto.PaymentResponse;
 import com.ecom.paymentservice.model.Payment;
@@ -34,6 +36,7 @@ public class PaymentService {
     private final WebClient webClient;
     private final SqsClient sqsClient;
     private final IDGenerator idGenerator;
+    private final Logger logger;
 
     public PaymentResponse initiatePayment(PaymentRequest paymentRequest){
         OrderResponse orderResponse=webClient
@@ -44,7 +47,8 @@ public class PaymentService {
             .block();
         
         if(orderResponse==null || orderResponse.getId()==null){
-            throw new RuntimeException("no such order");
+            logger.error("no such order");
+            return null;
         }
 
         LocalDateTime now=LocalDateTime.now();
@@ -54,7 +58,7 @@ public class PaymentService {
             .orderId(paymentRequest.getOrderId())
             .paymentMode(paymentRequest.getPaymentMode())
             .updatedAt(now)
-            .paymentStatus(PaymentStatus.PaymentStatusInitiated)
+            .paymentStatus(PaymentStatus.PAYMENT_STATUS_INITIATED)
             .build();
 
         paymentRepository.save(payment);
@@ -65,8 +69,11 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse getPayment(Long paymentId){
-        Payment payment=paymentRepository.findById(paymentId).get();
-        return paymentResponseFrom(payment);
+        Optional<Payment> payment=paymentRepository.findById(paymentId);
+        if(!payment.isPresent()){
+            return null;
+        }
+        return paymentResponseFrom(payment.get());
     }
 
 
@@ -76,7 +83,8 @@ public class PaymentService {
         Payment payment=paymentRepository.findById(paymentId).get();
 
         if(!validateStatusUpdate(payment, paymentStatus)){
-            throw new RuntimeException("invalid request for payment update");
+            logger.error("invalid request for payment update");
+            return null;
         }
 
         payment.setPaymentStatus(paymentStatus);
@@ -92,7 +100,6 @@ public class PaymentService {
         String queueUrl="/000000000000/queue-payment-events";
         
         try {
-            // Send a message
             PaymentEvent paymentEvent=PaymentEvent.builder()
                 .id(paymentResponse.getId())
                 .orderId(paymentResponse.getOrderId())
@@ -109,16 +116,8 @@ public class PaymentService {
                     .messageBody(msg)
                     .build();
             sqsClient.sendMessage(sendRequest);
-            System.out.println("Message sent successfully payment status event!");
-
-        } catch (SqsException e) {
-            System.err.println(e.awsErrorDetails().errorMessage());
-            // System.exit(1);
-        } catch(JsonProcessingException e){
-            System.err.println(e.getMessage());
-        }
-        finally {
-            // sqsClient.close();
+        } catch (SqsException|JsonProcessingException e) {
+            logger.error(e.getMessage());
         }
         
 
@@ -126,23 +125,23 @@ public class PaymentService {
 
     private boolean validateStatusUpdate(Payment payment, PaymentStatus newPaymentStatus){
         switch (payment.getPaymentStatus()) {
-            case PaymentStatusFailed:
-                if(newPaymentStatus==PaymentStatus.PaymentStatusInitiated){
+            case PAYMENT_STATUS_FAILED:
+                if(newPaymentStatus==PaymentStatus.PAYMENT_STATUS_INITIATED){
                     return true;
                 }
                 break;
-            case PaymentStatusInitiated:
-                if(newPaymentStatus==PaymentStatus.PaymentStatusSuccess){
+            case PAYMENT_STATUS_INITIATED:
+                if(newPaymentStatus==PaymentStatus.PAYMENT_STATUS_SUCCESS){
                     return true;
                 }
                 break;
-            case PaymentStatusSuccess:
-                if(newPaymentStatus==PaymentStatus.PaymentStatusRefundInitiated){
+            case PAYMENT_STATUS_SUCCESS:
+                if(newPaymentStatus==PaymentStatus.PAYMENT_STATUS_REFUND_INITIATED){
                     return true;
                 }
                 break;
-            case PaymentStatusRefundInitiated:
-                if(newPaymentStatus==PaymentStatus.PaymentStatusRefunded){
+            case PAYMENT_STATUS_REFUND_INITIATED:
+                if(newPaymentStatus==PaymentStatus.PAYMENT_STATUS_REFUNDED){
                     return true;
                 }
                 break;
@@ -154,7 +153,7 @@ public class PaymentService {
     }
 
     private PaymentResponse paymentResponseFrom(Payment payment){
-        PaymentResponse paymentResponse=PaymentResponse.builder()
+        return PaymentResponse.builder()
             .createdAt(payment.getCreatedAt())
             .id(payment.getId())
             .orderId(payment.getOrderId())
@@ -162,7 +161,6 @@ public class PaymentService {
             .paymentStatus(payment.getPaymentStatus())
             .updatedAt(payment.getUpdatedAt())
             .build();
-        return paymentResponse;
     }
 }
 

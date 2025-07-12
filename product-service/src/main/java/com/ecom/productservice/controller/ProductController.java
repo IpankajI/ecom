@@ -33,8 +33,7 @@ public class ProductController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ProductResponse> getAllProducts(){
-        List<ProductResponse> productResponses=productService.getProducts();
-        return productResponses;
+        return productService.getProducts();
     }
 
     @GetMapping("/{productId}")

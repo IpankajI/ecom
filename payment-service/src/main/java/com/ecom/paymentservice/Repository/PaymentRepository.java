@@ -1,4 +1,4 @@
-package com.ecom.paymentservice.Repository;
+package com.ecom.paymentservice.repository;
 
 import java.util.Optional;
 

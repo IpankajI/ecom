@@ -23,13 +23,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Controller {
     
-    private final AuthenticationManager authenticationManager;
-    private final Auth0 auth0;
-    private final AppConfig appConfig;
+    private AuthenticationManager authenticationManager;
+    private Auth0 auth0;
+    private AppConfig appConfig;
 
     @GetMapping("/home")
     public String home(){
-
         return "welcome! "+appConfig.otpClient;
     }
 

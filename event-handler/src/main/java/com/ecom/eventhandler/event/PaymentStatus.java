@@ -1,9 +1,9 @@
 package com.ecom.eventhandler.event;
 
 public enum PaymentStatus {
-    PaymentStatusInitiated,
-    PaymentStatusFailed,
-    PaymentStatusSuccess,
-    PaymentStatusRefundInitiated,
-    PaymentStatusRefunded
+    PAYMENT_STATUS_INITIATED,
+    PAYMENT_STATUS_FAILED,
+    PAYMENT_STATUS_SUCCESS,
+    PAYMENT_STATUS_REFUND_INITIATED,
+    PAYMENT_STATUS_REFUNDED
 }
