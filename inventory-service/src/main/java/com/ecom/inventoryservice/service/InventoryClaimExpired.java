@@ -4,7 +4,7 @@ package com.ecom.inventoryservice.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
+// import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ import com.ecom.inventoryservice.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@EnableScheduling
+// @EnableScheduling
 @RequiredArgsConstructor
 public class InventoryClaimExpired {
     private final InventoryOperationRepository inventoryOperationRepository;
@@ -53,7 +53,7 @@ public class InventoryClaimExpired {
         // get lock on inventory
         Inventory inventory=inventoryRepository.findById(inventoryId).get();
         if(inventory==null){
-            throw new RuntimeCryptoException("inventory not found");
+            throw new RuntimeException("inventory not found");
         }
         InventoryOperation inventoryOperation=inventoryOperationRepository.findById(operationId).get();
         if(inventoryOperation==null){

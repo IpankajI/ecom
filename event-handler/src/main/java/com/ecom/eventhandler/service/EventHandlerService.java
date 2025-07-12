@@ -45,9 +45,9 @@ public class EventHandlerService {
                 .maxNumberOfMessages(10)
                 .build();
         List<Message> messages = sqsClient.receiveMessage(receiveRequest).messages();
-        System.out.println("Received message count on order-events: " + messages.size());
+        // System.out.println("Received message count on order-events: " + messages.size());
         for (Message message : messages) {
-            System.out.println("Received message on order-events: " + message.body());
+            // System.out.println("Received message on order-events: " + message.body());
 
             // Delete the message after processing
             DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
@@ -70,9 +70,9 @@ public class EventHandlerService {
                 .maxNumberOfMessages(10)
                 .build();
         List<Message> messages = sqsClient.receiveMessage(receiveRequest).messages();
-        System.out.println("Received message count on payment-events:: " + messages.size());
+        // System.out.println("Received message count on payment-events:: " + messages.size());
         for (Message message : messages) {
-            System.out.println("Received message on payment-events: " + message.body());
+            // System.out.println("Received message on payment-events: " + message.body());
             PaymentEvent paymentEvent=null;
             ObjectMapper objectMapper=new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());

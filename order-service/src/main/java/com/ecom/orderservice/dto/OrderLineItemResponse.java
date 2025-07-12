@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderLineItemResponse {
     private Long id;
-    private String skuCode;
     private BigDecimal totalAmount;
     private Integer quantity;   
     private Long inventoryId;

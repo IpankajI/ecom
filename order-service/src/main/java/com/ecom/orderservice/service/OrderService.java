@@ -249,8 +249,8 @@ public class OrderService {
         orderLineItemResponse.setId(orderLineItem.getId());
         orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount());
         orderLineItemResponse.setQuantity(orderLineItem.getQuantity());
-        orderLineItemResponse.setSkuCode(orderLineItem.getSkuCode());
         orderLineItemResponse.setProductId(inventoryResponse.getProductId());
+        orderLineItemResponse.setInventoryId(inventoryResponse.getId());
 
         return orderLineItemResponse;
 
