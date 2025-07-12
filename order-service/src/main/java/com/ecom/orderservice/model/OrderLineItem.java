@@ -24,7 +24,6 @@ public class OrderLineItem {
     
     @Id
     private Long id;
-    private String skuCode;
     private BigDecimal totalAmount;
     private Integer quantity;
     @ManyToOne

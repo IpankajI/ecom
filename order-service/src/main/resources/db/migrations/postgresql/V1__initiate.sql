@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS public.order_line_items
     inventory_claim_id bigint,
     inventory_id bigint NOT NULL,
     quantity integer,
-    sku_code character varying(255) COLLATE pg_catalog."default",
     total_amount numeric(38,2),
     order_id bigint,
     CONSTRAINT order_line_items_pkey PRIMARY KEY (id),

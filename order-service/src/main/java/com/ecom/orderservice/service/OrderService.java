@@ -227,7 +227,6 @@ public class OrderService {
         orderLineItem.setId(idGenerator.next());
         orderLineItem.setTotalAmount(lineItemTotal);
         orderLineItem.setQuantity(orderLineItemRequest.getQuantity());
-        orderLineItem.setSkuCode("NA");
        
         orderLineItem.setOrder(order);
 
@@ -250,7 +249,6 @@ public class OrderService {
         orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount());
         orderLineItemResponse.setQuantity(orderLineItem.getQuantity());
         orderLineItemResponse.setProductId(inventoryResponse.getProductId());
-        orderLineItemResponse.setInventoryId(inventoryResponse.getId());
 
         return orderLineItemResponse;
 

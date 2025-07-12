@@ -14,6 +14,5 @@ public class OrderLineItemResponse {
     private Long id;
     private BigDecimal totalAmount;
     private Integer quantity;   
-    private Long inventoryId;
     private String productId;
 }
