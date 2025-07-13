@@ -26,8 +26,10 @@ docker run \
 ```
 
 # sonarqube static code analysis command
+```
 mvn clean verify sonar:sonar \
   -Dsonar.projectKey=ecom \
   -Dsonar.projectName='ecom' \
   -Dsonar.host.url=http://sonarqube:9000 \
   -Dsonar.token=sqp_1512b34fa0a47d8dfbd1741d458d3b204e8fd6aa;
+```
