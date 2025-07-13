@@ -8,7 +8,7 @@ building an e-commerce plaform with java and spring.
 - [x] add async processing for payment and order status update
 - [x] use integer for all ID column
 - [x] add database migration tools
-- [ ] add static code analysis
+- [x] add static code analysis
 - [x] set up docker-compose and local dev environment
 - [ ] api documentation
 - [ ] design doc
