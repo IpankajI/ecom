@@ -64,6 +64,7 @@ services:
       - ecom-network
     depends_on:
       - postgres
+      - sonarqube
     volumes:
       - ./inventory-service:/app
   order-service:

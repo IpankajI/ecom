@@ -13,10 +13,8 @@ public class InventoryServiceApplication {
 		SpringApplication.run(InventoryServiceApplication.class, args);
 	}
 
-
 	@Bean
 	public WebClient webClient(){
-
 		return WebClient.builder().build();
 	}
 
