@@ -30,12 +30,13 @@ spring:
         inventory-service:
           uri: http://inventory-service:30002
           predicates:
-            - Path=/api/inventories/**
+            - Path=/api/inventories/**,/api/docs/inventories/**,v3/api-docs/**
           filters:
             - name: AddRequestHeader
               args:
                 name: X-Test
                 values: inventory-service
+            - RewritePath=/api/docs/inventories/?(?<segment>.*), /$\{segment}
         registry-server:
           uri: http://registry-server:8761
           predicates:

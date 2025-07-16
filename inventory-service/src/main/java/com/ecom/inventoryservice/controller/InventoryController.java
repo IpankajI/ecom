@@ -20,11 +20,13 @@ import com.ecom.inventoryservice.dto.InventoryResponse;
 import com.ecom.inventoryservice.model.Inventory;
 import com.ecom.inventoryservice.service.InventoryService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/inventories")
 @RequiredArgsConstructor
+@Tag(name = "inventory apis")
 public class InventoryController {
     
     private final InventoryService inventoryService;

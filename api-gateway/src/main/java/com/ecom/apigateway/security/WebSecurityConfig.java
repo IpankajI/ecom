@@ -4,6 +4,7 @@ package com.ecom.apigateway.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,11 +35,14 @@ public class WebSecurityConfig{
             .authorizeHttpRequests(
                 request -> request
                             .requestMatchers(HttpMethod.POST, "/otp/**").permitAll() 
-                            .requestMatchers(HttpMethod.POST, "/users/**").permitAll()            
+                            .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll() 
+                            .requestMatchers(HttpMethod.GET, "/api/docs/**").permitAll()            
+                            .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()            
                             // .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                             // .requestMatchers(HttpMethod.POST,"/verify/**" ).permitAll()
                             .anyRequest().authenticated()
             )
+            .csrf(Customizer.withDefaults())
             .addFilterBefore(authFilterOtp, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(authFilterJwt, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(authFilterUP, UsernamePasswordAuthenticationFilter.class)

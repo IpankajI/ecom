@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AppUser{
     
-    private Integer id;
+    private Long id;
     private String phoneNumber;
     private String name;
     private String password;
