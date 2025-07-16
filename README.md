@@ -14,6 +14,12 @@ building an e-commerce plaform with java and spring.
 - [ ] design doc
 
 
+# run all services
+prerequisite: following databases need to be created
+```
+docker-compose up
+```
+
 # queue:
 command to run amazon sqs compatible queue
 ```

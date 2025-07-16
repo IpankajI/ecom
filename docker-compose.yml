@@ -4,14 +4,22 @@ services:
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=order-db
+      - POSTGRES_DB=postgres
       - PGUSER=root
+      - POSTGRES_MULTIPLE_DATABASES=inventory,order,payment,user,sonar
     ports:
       - "5432:5432"
     networks:
       - ecom-network
     volumes:
       - ./tmp/postgres-data:/var/lib/postgresql/data
+      - ./docker-postgresql-multiple-databases:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
   queue:
     image: localstack/localstack
     ports:
@@ -23,11 +31,6 @@ services:
       - ./tmp/queue:/var/run/docker.sock
   mongo:
     image: mongodb/mongodb-community-server:6.0.19-ubi8
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=order-db
-      - PGUSER=root
     ports:
       - "27017:27017"
     networks:
