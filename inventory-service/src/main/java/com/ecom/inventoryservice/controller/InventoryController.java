@@ -20,6 +20,7 @@ import com.ecom.inventoryservice.dto.InventoryResponse;
 import com.ecom.inventoryservice.model.Inventory;
 import com.ecom.inventoryservice.service.InventoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +34,7 @@ public class InventoryController {
     private final Logger logger;
 
     @GetMapping
+    @Operation(description = "get all inventories")
     public List<InventoryResponse> getInventories(){
         List<Inventory> inventories=inventoryService.getInventories();
         if(inventories==null){

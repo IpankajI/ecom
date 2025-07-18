@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.ecom.apigateway.utils.JwtUtil;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -24,4 +26,9 @@ public class AppConfig {
     public PasswordEncoder bCrypt(){
         return new BCryptPasswordEncoder();
     }
+
+	@Bean
+	public JwtUtil jwtUtil(){
+		return new JwtUtil(System.getenv("PRIVATE_KEY"), System.getenv("PUBLIC_KEY"));
+	}
 }

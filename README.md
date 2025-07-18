@@ -11,6 +11,7 @@ building an e-commerce plaform with java and spring.
 - [x] add static code analysis
 - [x] set up docker-compose and local dev environment
 - [ ] api documentation
+- [ ] add role based login for users for merchant and customers
 - [ ] design doc
 - [ ] improve test coverage
 - [ ] integrate github CI/CD

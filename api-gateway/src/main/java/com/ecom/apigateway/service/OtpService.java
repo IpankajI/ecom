@@ -1,8 +1,5 @@
 package com.ecom.apigateway.service;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,12 +52,8 @@ public class OtpService {
                 break;
             default:
                 String subject=(String)authentication.getPrincipal();
-                try {
-                    tokenResponse.setAccessToken(jwtUtil.generateToken(subject));
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                    return tokenResponse;
-                }
-                break;
+                tokenResponse.setAccessToken(jwtUtil.generateToken(subject));
+                return tokenResponse;
         }
 
 

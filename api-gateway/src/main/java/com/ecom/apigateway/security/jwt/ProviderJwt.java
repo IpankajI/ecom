@@ -28,18 +28,13 @@ public class ProviderJwt implements AuthenticationProvider{
         if(jwt==null){
             return null;
         }
-        String subject;
+        String subject=null;
         try {
-            subject = jwtUtil.extractUserName(jwt);
-        } catch (JwtException|IllegalArgumentException|NoSuchAlgorithmException|InvalidKeySpecException e ) {
-            return null;
-        }
-
-        try {
-            if(!jwtUtil.isTokenValid(jwt, subject)){
+            if(!jwtUtil.isTokenValid(jwt)){
                 return null;
             }
-        } catch (JwtException|IllegalArgumentException|NoSuchAlgorithmException|InvalidKeySpecException e) {
+            subject = jwtUtil.extractUserName(jwt);
+        } catch (JwtException|IllegalArgumentException|NoSuchAlgorithmException|InvalidKeySpecException e ) {
             return null;
         }
 

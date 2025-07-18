@@ -26,7 +26,7 @@ public class Twilio {
             .bodyToMono(OtpResponse.class)
             .block();
 
-        if(!otpResponse.getTo().equals(phoneNumber) || !otpResponse.isValid() || !otpResponse.getStatus().equals("pending")){
+        if(otpResponse==null || !otpResponse.getTo().equals(phoneNumber) || !otpResponse.isValid() || !otpResponse.getStatus().equals("pending")){
             return "failed";
         }
 
@@ -44,6 +44,6 @@ public class Twilio {
             .bodyToMono(OtpResponse.class)
             .block();
 
-        return otpResponse.getTo().equals(phoneNumber) && otpResponse.isValid() && otpResponse.getStatus().equals("approved");
+        return otpResponse!=null && otpResponse.getTo().equals(phoneNumber) && otpResponse.isValid() && otpResponse.getStatus().equals("approved");
     }
 }
