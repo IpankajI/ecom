@@ -49,7 +49,6 @@ public class AppUserController {
 
     @PostMapping("/verify")
     public Boolean verifyUsernamePassword(@RequestBody VerifyUsernamePasswordRequest request){
-        System.out.println("......got req");
         return appUserService.verifyUsernamePassword(request.getName(), request.getPassword());
     }
 

@@ -16,26 +16,33 @@ spring:
         product-service:
           uri: http://product-service:30001
           predicates:
-            - Path=/api/products/**
+            - Path=/api/products/**,/api/docs/products/**,v3/api-docs/products/**
           filters:
             - name: AddRequestHeader
               args:
                 name: X-Test
                 values: product-service
+            - RewritePath=/api/docs/products/?(?<segment>.*), /$\{segment}
         order-service:
           uri: http://order-service:30003
           predicates:
-            - Path=/api/orders/**
-            - Method=GET,POST,PATCH
-        inventory-service:
-          uri: http://inventory-service:30002
-          predicates:
-            - Path=/api/inventories/**,/api/docs/inventories/**,v3/api-docs/**
+            - Path=/api/orders/**,/api/docs/orders/**,v3/api-docs/orders/**
           filters:
             - name: AddRequestHeader
               args:
                 name: X-Test
                 values: inventory-service
+            - RewritePath=/api/docs/orders/?(?<segment>.*), /$\{segment}
+        inventory-service:
+          uri: http://inventory-service:30002
+          predicates:
+            - Path=/api/inventories/**,/api/docs/inventories/**,/v3/api-docs/inventories/**
+          filters:
+            - name: AddRequestHeader
+              args:
+                name: X-Test
+                values: inventory-service
+            # - RewritePath=/api/docs/inventories/v3/api-docs/?(?<segment>.*), /api/docs/inventories/v3/api-docs/$\{segment}
             - RewritePath=/api/docs/inventories/?(?<segment>.*), /$\{segment}
         registry-server:
           uri: http://registry-server:8761
@@ -50,13 +57,23 @@ spring:
         user-service:
           uri: http://user-service:30004
           predicates:
-            - Path=/api/users/**
-            - Method=GET,POST
+            - Path=/api/users/**,/api/docs/users/**,v3/api-docs/users/**
+          filters:
+            - name: AddRequestHeader
+              args:
+                name: X-Test
+                values: user-service
+            - RewritePath=/api/docs/users/?(?<segment>.*), /$\{segment}
         payment-service:
           uri: http://payment-service:30005
           predicates:
-            - Path=/api/payments/**
-            - Method=GET,POST,PATCH
+            - Path=/api/payments/**,/api/docs/payments/**,v3/api-docs/payments/**
+          filters:
+            - name: AddRequestHeader
+              args:
+                name: X-Test
+                values: payment-service
+            - RewritePath=/api/docs/payments/?(?<segment>.*), /$\{segment}
     function.definition: consumeHello
     stream.bindings.consumeHello-in-0.destination: hello-out-0
 # logging:

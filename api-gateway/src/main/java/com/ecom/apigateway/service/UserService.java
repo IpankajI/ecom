@@ -18,7 +18,6 @@ public class UserService {
                                                 .name(username)
                                                 .password(password)
                                                 .build();
-        System.out.println("......sending req");
         return webClient.post()
                             .uri("http://user-service:30004/api/users/verify")
                             .bodyValue(userVerifyRequest)
