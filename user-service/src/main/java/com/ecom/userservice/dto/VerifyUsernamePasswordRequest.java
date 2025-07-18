@@ -1,22 +1,13 @@
-package com.ecom.apigateway.model;
+package com.ecom.userservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppUser{
-    
-    private Long id;
-    private String phoneNumber;
+public class VerifyUsernamePasswordRequest {
     private String name;
     private String password;
-   
 }

@@ -4,9 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.ecom.apigateway.model.AppUser;
 import com.ecom.apigateway.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProviderUsernamePassword implements AuthenticationProvider{
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) {
@@ -24,12 +21,7 @@ public class ProviderUsernamePassword implements AuthenticationProvider{
         String username=(String)authentication.getPrincipal();
         String password=(String)authentication.getCredentials();
         
-        if(username==null || password==null){
-            return null;
-        }
-
-        AppUser appUser=userService.getUser(username);
-        if (appUser==null || !passwordEncoder.matches(password, appUser.getPassword())) {
+        if(username==null || password==null || Boolean.TRUE.equals(!userService.verifyUser(username, password))){
             return null;
         }
 

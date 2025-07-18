@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecom.apigateway.appconfig.AppConfig;
 import com.ecom.apigateway.dto.TokenResponse;
-import com.ecom.apigateway.model.AppUser;
+import com.ecom.apigateway.dto.UserResponse;
 import com.ecom.apigateway.utils.Auth0;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -43,10 +43,10 @@ public class Controller {
     }
 
     @PostMapping("/verify/{otp}/{usr}")
-    public TokenResponse verify(@RequestBody AppUser appUser, @PathVariable("otp") String otp, @PathVariable("usr") String usr) throws JsonProcessingException{
+    public TokenResponse verify(@RequestBody UserResponse userResponse, @PathVariable("otp") String otp, @PathVariable("usr") String usr) throws JsonProcessingException{
 
         Authentication authentication= authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(appUser.getPhoneNumber(), appUser.getPassword())
+            new UsernamePasswordAuthenticationToken(userResponse.getPhoneNumber(), userResponse.getPassword())
             );
 
         if(authentication.isAuthenticated()){

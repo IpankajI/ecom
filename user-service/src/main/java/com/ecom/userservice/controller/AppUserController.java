@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecom.userservice.dto.CreateAppUserRequest;
+import com.ecom.userservice.dto.AppUserResponse;
+import com.ecom.userservice.dto.VerifyUsernamePasswordRequest;
 import com.ecom.userservice.model.AppUser;
 import com.ecom.userservice.service.AppUserService;
 
@@ -20,13 +23,34 @@ public class AppUserController {
     private final AppUserService appUserService;
 
     @PostMapping()
-    public void createAppUser(@RequestBody AppUser appUser){
+    public AppUserResponse createAppUser(@RequestBody CreateAppUserRequest request){
+        AppUser appUser=AppUser.builder()
+            .name(request.getName())
+            .password(request.getPassword())
+            .phoneNumber(request.getPhoneNumber())
+            .build();
         appUserService.createAppUser(appUser);
+
+        return toAppUserResponseFrom(appUser);
     }
 
     @GetMapping("/{username}")
-    public AppUser getAppUserByUsername(@PathVariable("username") String username){
-        return appUserService.getAppUserByUsername(username);
+    public AppUserResponse getAppUserByUsername(@PathVariable("username") String username){
+        return toAppUserResponseFrom(appUserService.getAppUserByUsername(username));
+    }
+
+    private AppUserResponse toAppUserResponseFrom(AppUser appUser){
+        return AppUserResponse.builder()
+            .id(appUser.getId())
+            .name(appUser.getName())
+            .phoneNumber(appUser.getPhoneNumber())
+            .build();
+    }
+
+    @PostMapping("/verify")
+    public Boolean verifyUsernamePassword(@RequestBody VerifyUsernamePasswordRequest request){
+        System.out.println("......got req");
+        return appUserService.verifyUsernamePassword(request.getName(), request.getPassword());
     }
 
 }

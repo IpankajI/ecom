@@ -17,10 +17,10 @@ public class AppUserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final IDGenerator idGenerator;
 
-    public void createAppUser(AppUser appUser){
+    public AppUser createAppUser(AppUser appUser){
         appUser.setId(idGenerator.next());
         appUser.setPassword(bCryptPasswordEncoder.encode(appUser.getPassword()));
-        appUserRepository.save(appUser);
+        return appUserRepository.save(appUser);
     }
 
     public AppUser getAppUserByPhoneNumber(String phoneNumber){
@@ -29,6 +29,11 @@ public class AppUserService {
 
     public AppUser getAppUserByUsername(String username){
         return appUserRepository.getByName(username);
+    }
+
+    public Boolean verifyUsernamePassword(String username, String password){
+        AppUser appUser=appUserRepository.getByName(username);
+        return bCryptPasswordEncoder.matches(password, appUser.getPassword());
     }
 
 }

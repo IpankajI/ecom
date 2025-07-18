@@ -37,6 +37,16 @@ services:
       - ecom-network
     volumes:
       - ./tmp/mongo/data/db:/data/db
+  registry-server:
+    build:
+      context: registry-server
+      dockerfile: Dockerfile
+    networks:
+      - ecom-network
+    depends_on:
+      - postgres
+    volumes:
+      - ./registry-server:/app
   api-gateway:
     build:
       context: api-gateway
@@ -111,6 +121,7 @@ services:
     depends_on:
       - postgres
       - sonarqube
+      - registry-server
     volumes:
       - ./inventory-service:/app
   order-service:
@@ -121,6 +132,7 @@ services:
       - ecom-network
     depends_on:
       - postgres
+      - registry-server
     volumes:
       - ./order-service:/app
   payment-service:
@@ -131,6 +143,7 @@ services:
       - ecom-network
     depends_on:
       - postgres
+      - registry-server
     volumes:
       - ./payment-service:/app
   product-service:
@@ -141,18 +154,9 @@ services:
       - ecom-network
     depends_on:
       - postgres
+      - registry-server
     volumes:
       - ./product-service:/app
-  registry-server:
-    build:
-      context: registry-server
-      dockerfile: Dockerfile
-    networks:
-      - ecom-network
-    depends_on:
-      - postgres
-    volumes:
-      - ./registry-server:/app
   user-service:
     build:
       context: user-service
@@ -161,6 +165,7 @@ services:
       - ecom-network
     depends_on:
       - postgres
+      - registry-server
     volumes:
       - ./user-service:/app
 
