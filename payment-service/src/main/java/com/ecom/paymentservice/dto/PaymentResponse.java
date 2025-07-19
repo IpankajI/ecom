@@ -11,8 +11,8 @@ import lombok.Data;
 @Data
 @Builder
 public class PaymentResponse {
-    private Long id;
-    private Long orderId;
+    private String id;
+    private String orderId;
     private PaymentMode paymentMode;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;

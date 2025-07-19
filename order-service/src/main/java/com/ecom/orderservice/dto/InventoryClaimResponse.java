@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class InventoryClaimResponse {
-    private Long claimId;
+    private String claimId;
 }

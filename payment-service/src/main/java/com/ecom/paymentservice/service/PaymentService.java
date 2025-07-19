@@ -55,7 +55,7 @@ public class PaymentService {
         Payment payment=Payment.builder()
             .id(idGenerator.next())
             .createdAt(now)
-            .orderId(paymentRequest.getOrderId())
+            .orderId(Long.valueOf(paymentRequest.getOrderId()))
             .paymentMode(paymentRequest.getPaymentMode())
             .updatedAt(now)
             .paymentStatus(PaymentStatus.PAYMENT_STATUS_INITIATED)
@@ -101,8 +101,8 @@ public class PaymentService {
         
         try {
             PaymentEvent paymentEvent=PaymentEvent.builder()
-                .id(paymentResponse.getId())
-                .orderId(paymentResponse.getOrderId())
+                .id(Long.valueOf(paymentResponse.getId()))
+                .orderId(Long.valueOf(paymentResponse.getOrderId()))
                 .paymentMode(paymentResponse.getPaymentMode())
                 .paymentStatus(paymentResponse.getPaymentStatus())
                 .createdAt(paymentResponse.getCreatedAt())
@@ -155,8 +155,8 @@ public class PaymentService {
     private PaymentResponse paymentResponseFrom(Payment payment){
         return PaymentResponse.builder()
             .createdAt(payment.getCreatedAt())
-            .id(payment.getId())
-            .orderId(payment.getOrderId())
+            .id(payment.getId().toString())
+            .orderId(payment.getOrderId().toString())
             .paymentMode(payment.getPaymentMode())
             .paymentStatus(payment.getPaymentStatus())
             .updatedAt(payment.getUpdatedAt())
