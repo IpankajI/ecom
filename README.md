@@ -9,7 +9,7 @@ building an e-commerce plaform with java and spring.
 - [x] use integer for all ID column
 - [x] add database migration tools
 - [x] add static code analysis
-- [x] set up docker-compose and local dev environment
+- [x] set up docker-compose and local dev environment(hot loading)
 - [x] api documentation
 - [ ] add role based login for users for merchant and customers
 - [ ] design doc
