@@ -55,7 +55,7 @@ class ProductServiceApplicationTests {
 	}
 
 	private ProductRequest getProductRequest(){
-		return ProductRequest.builder().description("iphone 12").name("iphone 12").price(BigDecimal.valueOf(70000)).build();
+		return ProductRequest.builder().description("iphone 12").name("iphone 12").price(BigDecimal.valueOf(70000).toString()).build();
 	}
 
 }

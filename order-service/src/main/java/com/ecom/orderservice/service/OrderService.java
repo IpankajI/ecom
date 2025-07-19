@@ -70,7 +70,7 @@ public class OrderService {
             .bodyToMono(InventoryClaimResponse.class)
             .block();
 
-            orderLineItem.setInventoryClaimId(inventoryClaimResponse.getClaimId());
+            orderLineItem.setInventoryClaimId(Long.valueOf(inventoryClaimResponse.getClaimId()));
         }
 
     }
@@ -79,7 +79,7 @@ public class OrderService {
 
         for(OrderLineItem orderLineItem: orderLineItems){
             webClient.patch()
-                .uri(INVENTORY_ENDPONT+orderLineItem.getInventoryId()+"/claim/"+orderLineItem.getInventoryClaimId())
+                .uri(INVENTORY_ENDPONT+"/claim/"+orderLineItem.getInventoryClaimId()+"/mark")
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -205,7 +205,7 @@ public class OrderService {
        
         orderLineItem.setOrder(order);
 
-        orderLineItem.setInventoryId(orderLineItemRequest.getInventoryId());
+        orderLineItem.setInventoryId(Long.valueOf(orderLineItemRequest.getInventoryId()));
         
         order.setTotalAmount(lineItemTotal.add(order.getTotalAmount()));
 
@@ -220,8 +220,8 @@ public class OrderService {
                 .retrieve()
                 .bodyToMono(InventoryResponse.class)
                 .block();
-        orderLineItemResponse.setId(orderLineItem.getId());
-        orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount());
+        orderLineItemResponse.setId(orderLineItem.getId().toString());
+        orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount().toString());
         orderLineItemResponse.setQuantity(orderLineItem.getQuantity());
         orderLineItemResponse.setProductId(inventoryResponse.getProductId());
 
@@ -233,19 +233,16 @@ public class OrderService {
     private OrderResponse orderResponseFrom(Order order){
         OrderResponse orderResponse=new OrderResponse();
 
-        orderResponse.setId(order.getId());
+        orderResponse.setId(order.getId().toString());
         orderResponse.setOrderLineItemResponses(
             order.getOrderLineItems().stream().map(orderLineItem -> orderLineItemResponseFrom(orderLineItem)).toList()
         );
         orderResponse.setOrderNumber(order.getOrderNumber());
-        orderResponse.setTotalAmount(order.getTotalAmount());
+        orderResponse.setTotalAmount(order.getTotalAmount().toString());
         orderResponse.setPaymentStatus(order.getPaymentStatus());
         orderResponse.setStatus(order.getStatus());
         return orderResponse;
     }
-
-
-
 
 }
 

@@ -144,7 +144,7 @@ public class InventoryService {
     }
 
     private ClaimInventoryResponse claimInventoryResponseFrom(InventoryOperation inventoryOperation){
-        return new ClaimInventoryResponse(inventoryOperation.getOperationId());
+        return new ClaimInventoryResponse(inventoryOperation.getOperationId().toString());
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)

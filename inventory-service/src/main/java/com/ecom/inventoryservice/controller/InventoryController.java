@@ -55,9 +55,9 @@ public class InventoryController {
     }
 
     @GetMapping("/{id}")
-    public InventoryResponse getInventory(@PathVariable("id") Long id){
+    public InventoryResponse getInventory(@PathVariable("id") String id){
 
-        Inventory inventory=inventoryService.getInventory(id);
+        Inventory inventory=inventoryService.getInventory(Long.valueOf(id));
         if(inventory==null){
             logger.error("no such inventory");
             return null;
@@ -69,7 +69,7 @@ public class InventoryController {
 
     private InventoryResponse inventoryResponseFrom(Inventory inventory){
         return InventoryResponse.builder()
-            .id(inventory.getId())
+            .id(inventory.getId().toString())
             .skuCode(inventory.getSkuCode())
             .productId(inventory.getProductId())
             .quantity(inventory.getQuantity())
@@ -77,18 +77,18 @@ public class InventoryController {
     }
 
     @PatchMapping("/{id}")
-    public void incrementInventoryQuantity(@PathVariable("id") Long id, @RequestBody IncrementInventoryQuantityRequest incrementInventoryQuantityRequest ){
-        inventoryService.incrementQuantityBy(id, incrementInventoryQuantityRequest.getIncBy());
+    public void incrementInventoryQuantity(@PathVariable("id") String id, @RequestBody IncrementInventoryQuantityRequest incrementInventoryQuantityRequest ){
+        inventoryService.incrementQuantityBy(Long.valueOf(id), incrementInventoryQuantityRequest.getIncBy());
     }
 
     @PostMapping("/{id}/claim")
-    public ClaimInventoryResponse claimInventoryQuantity(@PathVariable("id") Long id, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
-        return inventoryService.claimInventory(id, claimInventoryRequest.getQuantity());
+    public ClaimInventoryResponse claimInventoryQuantity(@PathVariable("id") String id, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
+        return inventoryService.claimInventory(Long.valueOf(id), claimInventoryRequest.getQuantity());
     }
 
-    @PatchMapping("/{id}/claim/{claim_id}")
-    public void markClaimCompleted(@PathVariable("claim_id") Long claimId, @PathVariable("id") Long id){
-        inventoryService.markInventoryClaimSold(claimId);
+    @PatchMapping("/claim/{claim_id}/mark")
+    public void markClaimCompleted(@PathVariable("claim_id") String claimId){
+        inventoryService.markInventoryClaimSold(Long.valueOf(claimId));
     }
 
 }

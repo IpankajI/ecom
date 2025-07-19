@@ -1,5 +1,6 @@
 package com.ecom.productservice.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -28,7 +29,7 @@ public class ProductService {
         Product product= Product.builder()
             .name(productRequest.getName())
             .description(productRequest.getDescription())
-            .price(productRequest.getPrice())
+            .price(BigDecimal.valueOf(Long.valueOf(productRequest.getPrice())))
             .build();
 
         productRepository.save(product);
@@ -58,7 +59,7 @@ public class ProductService {
             .description(product.getDescription())
             .id(product.getId())
             .name(product.getName())
-            .price(product.getPrice())
+            .price(product.getPrice().toString())
             .build();
     }
 }
