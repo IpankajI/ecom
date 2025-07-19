@@ -26,6 +26,13 @@ building an e-commerce plaform with java and spring.
 docker-compose --env-file .env up
 ```
 
+# API documentation pages(swagger-ui)
+1. http://localhost:8080/swagger-ui/index.html
+2. http://localhost:8080/api/docs/inventories/swagger-ui/index.html
+3. http://localhost:8080/api/docs/orders/swagger-ui/index.html
+4. http://localhost:8080/api/docs/payments/swagger-ui/index.html
+5. http://localhost:8080/api/docs/products/swagger-ui/index.html
+
 # queue:
 command to run amazon sqs compatible queue
 ```
