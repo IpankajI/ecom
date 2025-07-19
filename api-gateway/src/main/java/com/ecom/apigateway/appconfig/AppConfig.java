@@ -7,15 +7,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.apigateway.utils.JwtUtil;
 
-import lombok.RequiredArgsConstructor;
 
 @Configuration
-@RequiredArgsConstructor
 public class AppConfig {
 
 	@Value("${spring.appconfig.otp}")
 	public String otpClient;
 	public static final String OTP_CLIENT_AUTH0="auth0";
+	@Value("${TWILIO_USERNAME}")
+	public String twilioUsername;
+	@Value("${TWILIO_PASSWORD}")
+	public String twilioPassword;
 	@Bean
 	public WebClient webClient(){
 		return WebClient.builder().build();

@@ -46,7 +46,7 @@ public class Controller {
     public TokenResponse verify(@RequestBody UserResponse userResponse, @PathVariable("otp") String otp, @PathVariable("usr") String usr) throws JsonProcessingException{
 
         Authentication authentication= authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(userResponse.getPhoneNumber(), userResponse.getPassword())
+            new UsernamePasswordAuthenticationToken(userResponse.getPhoneNumber(), "xxxx")
             );
 
         if(authentication.isAuthenticated()){

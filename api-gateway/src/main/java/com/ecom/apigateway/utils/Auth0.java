@@ -21,8 +21,8 @@ public class Auth0 {
 
         TokenRequest tokenRequest=new TokenRequest();
         tokenRequest.setAudience("https://api.example.com");
-        tokenRequest.setClientId("zyzmHGAIj0TmCOd6vqHcyKQScLjbnMMT");
-        tokenRequest.setClientSecret("e72mF1wmapJd0Gnp-xqBSGKLUzflw7IlHoZlq12jBzoVmooa6Pw_Qk7jQNkLvwoh");
+        tokenRequest.setClientId(System.getenv("AUTH0_CLIENT_ID"));
+        tokenRequest.setClientSecret(System.getenv("AUTH0_CLIENT_SECRET"));
         tokenRequest.setGrantType("http://auth0.com/oauth/grant-type/passwordless/otp");
         tokenRequest.setOtp(otp);
         tokenRequest.setRealm("sms");
@@ -41,8 +41,8 @@ public class Auth0 {
 
     public Auth0OtpResponse requestOtp(String phoneNumber){
         Auth0OtpRequest auth0OtpRequest=new Auth0OtpRequest();
-        auth0OtpRequest.setClientId("zyzmHGAIj0TmCOd6vqHcyKQScLjbnMMT");
-        auth0OtpRequest.setClientSecret("e72mF1wmapJd0Gnp-xqBSGKLUzflw7IlHoZlq12jBzoVmooa6Pw_Qk7jQNkLvwoh");
+        auth0OtpRequest.setClientId(System.getenv("AUTH0_CLIENT_ID"));
+        auth0OtpRequest.setClientSecret(System.getenv("AUTH0_CLIENT_SECRET"));
         auth0OtpRequest.setConnection("sms");
         auth0OtpRequest.setPhoneNumber(phoneNumber);
         auth0OtpRequest.setSend("code");

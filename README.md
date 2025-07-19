@@ -10,13 +10,16 @@ building an e-commerce plaform with java and spring.
 - [x] add database migration tools
 - [x] add static code analysis
 - [x] set up docker-compose and local dev environment
-- [ ] api documentation
+- [x] api documentation
 - [ ] add role based login for users for merchant and customers
 - [ ] design doc
 - [ ] improve test coverage
 - [ ] integrate github CI/CD
 - [ ] standardise exception/error handling
-
+- [ ] add validations for all data
+- [ ] refactor dto and move all dto conversion from service to controller
+- [ ] add paginations
+- [ ] configuration management(build for different environment)
 
 # run all services
 prerequisite: following databases need to be created

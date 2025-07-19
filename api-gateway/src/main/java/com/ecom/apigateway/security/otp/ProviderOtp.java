@@ -45,7 +45,6 @@ public class ProviderOtp implements AuthenticationProvider{
             }
             auth=new AuthNOtp(phoneNumber);
             auth.setTokenResponse(tokenResponse);
-
         }
         else{
             if(!twilio.validateOtp(phoneNumber, otp)){

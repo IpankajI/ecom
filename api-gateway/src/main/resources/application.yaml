@@ -1,7 +1,7 @@
 spring:
   appconfig:
-    otp: auth0
-    # otp: twilio
+    # otp: auth0
+    otp: twilio
   threads:
     virtual:
       enabled: true
@@ -54,16 +54,6 @@ spring:
           uri: http://registry-server:8761
           predicates:
             - Path=/eureka/**
-        user-service:
-          uri: http://user-service:30004
-          predicates:
-            - Path=/api/users/**,/api/docs/users/**,v3/api-docs/users/**
-          filters:
-            - name: AddRequestHeader
-              args:
-                name: X-Test
-                values: user-service
-            - RewritePath=/api/docs/users/?(?<segment>.*), /$\{segment}
         payment-service:
           uri: http://payment-service:30005
           predicates:

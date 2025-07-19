@@ -93,6 +93,10 @@ services:
         S4MmT8BtwvnL6H1C3h9/oA==
         -----END PRIVATE KEY-----
 
+      AUTH0_CLIENT_ID: zyzmHGAIj0TmCOd6vqHcyKQScLjbnMMT
+      AUTH0_CLIENT_SECRET: e72mF1wmapJd0Gnp-xqBSGKLUzflw7IlHoZlq12jBzoVmooa6Pw_Qk7jQNkLvwoh
+      TWILIO_USERNAME: AC01a36273ee4e957e5d1a20283eb4cd68
+      TWILIO_PASSWORD: 3b777d44e45e5aae70c692c2e349e9af
 
     ports:
       - "8080:8080"

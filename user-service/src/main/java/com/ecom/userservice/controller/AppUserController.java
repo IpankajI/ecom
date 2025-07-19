@@ -52,4 +52,8 @@ public class AppUserController {
         return appUserService.verifyUsernamePassword(request.getName(), request.getPassword());
     }
 
+    @GetMapping("/phone-number/{phoneNumber}")
+    public AppUserResponse getAppUserByPhoneNumber(@PathVariable("phoneNumber") String phoneNumber){
+        return toAppUserResponseFrom(appUserService.getAppUserByPhoneNumber(phoneNumber));
+    }
 }
