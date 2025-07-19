@@ -13,11 +13,13 @@ import com.ecom.userservice.dto.VerifyUsernamePasswordRequest;
 import com.ecom.userservice.model.AppUser;
 import com.ecom.userservice.service.AppUserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "user apis")
 public class AppUserController {
     
     private final AppUserService appUserService;

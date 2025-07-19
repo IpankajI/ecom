@@ -59,7 +59,6 @@ public class InventoryController {
 
         Inventory inventory=inventoryService.getInventory(id);
         if(inventory==null){
-
             logger.error("no such inventory");
             return null;
         }

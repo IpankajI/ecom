@@ -16,11 +16,13 @@ import com.ecom.apigateway.dto.UserResponse;
 import com.ecom.apigateway.utils.Auth0;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@Hidden
 public class Controller {
     
     private AuthenticationManager authenticationManager;

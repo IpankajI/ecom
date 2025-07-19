@@ -19,7 +19,7 @@ building an e-commerce plaform with java and spring.
 - [ ] add validations for all data
 - [ ] refactor dto and move all dto conversion from service to controller
 - [ ] add paginations
-- [ ] configuration management(build for different environment)
+- [ ] add configuration management(build for different environment)
 
 # run all services
 ```

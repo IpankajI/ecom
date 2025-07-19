@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ecom.apigateway.appconfig.HttpXHeader;
 import com.ecom.apigateway.dto.SignUpRequest;
 import com.ecom.apigateway.dto.TokenResponse;
@@ -16,21 +17,25 @@ import com.ecom.apigateway.dto.UserResponse;
 import com.ecom.apigateway.service.OtpService;
 import com.ecom.apigateway.service.UserService;
 import com.ecom.apigateway.utils.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/api/auth")
+@Tag(name = "auth apis")
 public class AuthenticationController {
     private final OtpService otpService;
     private final JwtUtil jwtUtil;
     private final UserService userservice;
 
+    /*
+     * password is not used in this method, however it's required for swagger-ui to show it in form
+     */
     @PostMapping("/login/username")
-    public TokenResponse loginUsername(HttpServletRequest request){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String username=(String)authentication.getPrincipal();
+    public TokenResponse loginUsername(@RequestHeader(HttpXHeader.X_USERNAME) String username,
+                @RequestHeader(HttpXHeader.X_PASSWORD) String password){
         TokenResponse tokenResponse=new TokenResponse();
         tokenResponse.setAccessToken(jwtUtil.generateToken(username));
         return tokenResponse;
@@ -41,6 +46,9 @@ public class AuthenticationController {
         return otpService.requestOtp(phoneNumber);
     }
 
+    /*
+     * otp is not used in this method, however it's required for swagger-ui to show it in form
+     */
     @PostMapping("/login/otp")
     public TokenResponse loginOTP(@RequestHeader(HttpXHeader.X_PHONE_NUMBER) String phoneNumber,
             @RequestHeader(HttpXHeader.X_OTP) String otp){

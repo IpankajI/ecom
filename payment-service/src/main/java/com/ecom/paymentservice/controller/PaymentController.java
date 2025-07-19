@@ -13,11 +13,13 @@ import com.ecom.paymentservice.dto.PaymentResponse;
 import com.ecom.paymentservice.dto.UpdatePaymentStatusRequest;
 import com.ecom.paymentservice.service.PaymentService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
+@Tag(name = "payment apis")
 public class PaymentController {
 
     private final PaymentService paymentService;

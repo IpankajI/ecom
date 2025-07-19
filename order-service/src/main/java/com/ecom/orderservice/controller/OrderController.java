@@ -18,11 +18,13 @@ import com.ecom.orderservice.dto.OrderResponse;
 import com.ecom.orderservice.dto.OrderStatusRequest;
 import com.ecom.orderservice.service.OrderService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
+@Tag(name = "order apis")
 public class OrderController {
 
     private final OrderService orderService;
