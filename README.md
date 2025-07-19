@@ -22,9 +22,8 @@ building an e-commerce plaform with java and spring.
 - [ ] configuration management(build for different environment)
 
 # run all services
-prerequisite: following databases need to be created
 ```
-docker-compose up
+docker-compose --env-file .env up
 ```
 
 # queue:
