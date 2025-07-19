@@ -32,23 +32,3 @@ docker-compose --env-file .env up
 3. http://localhost:8080/api/docs/orders/swagger-ui/index.html
 4. http://localhost:8080/api/docs/payments/swagger-ui/index.html
 5. http://localhost:8080/api/docs/products/swagger-ui/index.html
-
-# queue:
-command to run amazon sqs compatible queue
-```
-docker run \
-  --rm -it \
-  -p 127.0.0.1:4566:4566 \
-  -p 127.0.0.1:4510-4559:4510-4559 \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  localstack/localstack
-```
-
-# sonarqube static code analysis command
-```
-mvn clean verify sonar:sonar \
-  -Dsonar.projectKey=ecom \
-  -Dsonar.projectName='ecom' \
-  -Dsonar.host.url=http://sonarqube:9000 \
-  -Dsonar.token=sqp_1512b34fa0a47d8dfbd1741d458d3b204e8fd6aa;
-```
