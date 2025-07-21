@@ -5,6 +5,7 @@ building an e-commerce plaform with java and spring.
 - [x] set up authentication and AUTHORIZATION
   - [x] username/password
   - [x] phone-number/otp
+  - [x] auth0 with google/github login
   - [x] jwt token
   - [ ] api-key/api-secret
   - [ ] passkeys
@@ -18,13 +19,12 @@ building an e-commerce plaform with java and spring.
 - [x] add static code analysis using sonarqube
 - [x] set up docker-compose and local dev environment(hot loading) with linux inotify-tools and spring-boot-devtools
 - [x] api documentation using swagger spring package
-- [ ] add role based login for users for merchant and customers
+- [ ] add role based login for users separating merchants and customers
 - [ ] design doc
 - [ ] improve test coverage
 - [ ] integrate github CI/CD
 - [ ] standardise exception/error handling
 - [ ] add validations for all data
-- [ ] refactor dto and move all dto conversion from service to controller
 - [ ] add paginations
 - [ ] add configuration management(build for different environment)
 
