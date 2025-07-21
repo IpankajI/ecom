@@ -4,8 +4,8 @@ building an e-commerce plaform with java and spring.
 - [x] set up project
 - [x] set up authentication and AUTHORIZATION
   - [x] username/password
-  - [x] phone-number/otp
-  - [x] auth0 with google/github login
+  - [x] phone-number/otp with twilio
+  - [x] auth0 login
   - [x] jwt token
   - [ ] api-key/api-secret
   - [ ] passkeys
@@ -26,7 +26,7 @@ building an e-commerce plaform with java and spring.
 - [ ] standardise exception/error handling
 - [ ] add validations for all data
 - [ ] add paginations
-- [ ] add configuration management(build for different environment)
+- [ ] add configuration management using spring-config-server
 
 # run all services, databases and sqs
 ```
