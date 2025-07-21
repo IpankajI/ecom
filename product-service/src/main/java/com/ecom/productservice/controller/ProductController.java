@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecom.productservice.dto.ProductRequest;
 import com.ecom.productservice.dto.ProductResponse;
+import com.ecom.productservice.model.Product;
 import com.ecom.productservice.service.ProductService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,12 +36,21 @@ public class ProductController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ProductResponse> getAllProducts(){
-        return productService.getProducts();
+        return productService.getProducts().stream().map(this::productResponseFrom).toList();
     }
 
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse getProduct(@PathVariable("productId") String productId){
-        return productService.getProduct(productId);
+        return productResponseFrom(productService.getProduct(productId));
+    }
+
+    private ProductResponse productResponseFrom(Product product){
+        return ProductResponse.builder()
+            .description(product.getDescription())
+            .id(product.getId())
+            .name(product.getName())
+            .price(product.getPrice().toString())
+            .build();
     }
 }

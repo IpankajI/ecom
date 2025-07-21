@@ -38,7 +38,7 @@ public class PaymentService {
     private final IDGenerator idGenerator;
     private final Logger logger;
 
-    public PaymentResponse initiatePayment(PaymentRequest paymentRequest){
+    public Payment initiatePayment(PaymentRequest paymentRequest){
         OrderResponse orderResponse=webClient
             .get()
             .uri("http://order-service:30003/api/orders/"+paymentRequest.getOrderId())
@@ -61,52 +61,45 @@ public class PaymentService {
             .paymentStatus(PaymentStatus.PAYMENT_STATUS_INITIATED)
             .build();
 
-        paymentRepository.save(payment);
-        PaymentResponse paymentResponse=paymentResponseFrom(payment);
-        sendPaymentEvent(paymentResponse);
-        return paymentResponse;
+        payment=paymentRepository.save(payment);
+        sendPaymentEvent(payment);
+        return payment;
     }
 
     @Transactional
-    public PaymentResponse getPayment(Long paymentId){
+    public Payment getPayment(Long paymentId){
         Optional<Payment> payment=paymentRepository.findById(paymentId);
         if(!payment.isPresent()){
             return null;
         }
-        return paymentResponseFrom(payment.get());
+        return payment.get();
     }
 
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public PaymentResponse updateStatus(Long paymentId, PaymentStatus paymentStatus){
-
+    public Payment updateStatus(Long paymentId, PaymentStatus paymentStatus){
         Payment payment=paymentRepository.findById(paymentId).get();
-
         if(!validateStatusUpdate(payment, paymentStatus)){
             logger.error("invalid request for payment update");
             return null;
         }
-
         payment.setPaymentStatus(paymentStatus);
-        paymentRepository.save(payment);
-        PaymentResponse paymentResponse=paymentResponseFrom(payment);
-
-        sendPaymentEvent(paymentResponse);
-
-        return paymentResponse;
+        payment=paymentRepository.save(payment);
+        sendPaymentEvent(payment);
+        return payment;
     }
 
-    private void sendPaymentEvent(PaymentResponse paymentResponse){
+    private void sendPaymentEvent(Payment payment){
         String queueUrl="/000000000000/queue-payment-events";
         
         try {
             PaymentEvent paymentEvent=PaymentEvent.builder()
-                .id(Long.valueOf(paymentResponse.getId()))
-                .orderId(Long.valueOf(paymentResponse.getOrderId()))
-                .paymentMode(paymentResponse.getPaymentMode())
-                .paymentStatus(paymentResponse.getPaymentStatus())
-                .createdAt(paymentResponse.getCreatedAt())
-                .updatedAt(paymentResponse.getUpdatedAt())
+                .id(Long.valueOf(payment.getId()))
+                .orderId(Long.valueOf(payment.getOrderId()))
+                .paymentMode(payment.getPaymentMode())
+                .paymentStatus(payment.getPaymentStatus())
+                .createdAt(payment.getCreatedAt())
+                .updatedAt(payment.getUpdatedAt())
                 .build();
             ObjectMapper objectMapper=new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
@@ -150,17 +143,6 @@ public class PaymentService {
         }
 
         return false;
-    }
-
-    private PaymentResponse paymentResponseFrom(Payment payment){
-        return PaymentResponse.builder()
-            .createdAt(payment.getCreatedAt())
-            .id(payment.getId().toString())
-            .orderId(payment.getOrderId().toString())
-            .paymentMode(payment.getPaymentMode())
-            .paymentStatus(payment.getPaymentStatus())
-            .updatedAt(payment.getUpdatedAt())
-            .build();
     }
 }
 

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ecom.inventoryservice.appconfig.AppConfig;
-import com.ecom.inventoryservice.dto.ClaimInventoryResponse;
 import com.ecom.inventoryservice.dto.ProductResponse;
 import com.ecom.inventoryservice.model.Inventory;
 import com.ecom.inventoryservice.model.InventoryOperation;
@@ -107,7 +106,7 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public ClaimInventoryResponse claimInventory(Long id, Integer quanity){
+    public InventoryOperation claimInventory(Long id, Integer quanity){
         if(quanity<=0){
             logger.error("claim quanity should be positive");
             return null;
@@ -138,14 +137,9 @@ public class InventoryService {
                         .quantity(quanity)
                         .updatedAt(now)
                         .build();
-        inventoryOperation=inventoryOperationRepository.save(inventoryOperation);
-
-        return claimInventoryResponseFrom(inventoryOperation);
+        return inventoryOperationRepository.save(inventoryOperation);
     }
 
-    private ClaimInventoryResponse claimInventoryResponseFrom(InventoryOperation inventoryOperation){
-        return new ClaimInventoryResponse(inventoryOperation.getOperationId().toString());
-    }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public void markInventoryClaimSold(long operationId){

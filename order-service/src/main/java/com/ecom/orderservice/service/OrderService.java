@@ -14,9 +14,7 @@ import com.ecom.orderservice.dto.InventoryClaimRequest;
 import com.ecom.orderservice.dto.InventoryClaimResponse;
 import com.ecom.orderservice.dto.InventoryResponse;
 import com.ecom.orderservice.dto.OrderLineItemRequest;
-import com.ecom.orderservice.dto.OrderLineItemResponse;
 import com.ecom.orderservice.dto.OrderRequest;
-import com.ecom.orderservice.dto.OrderResponse;
 import com.ecom.orderservice.model.Order;
 import com.ecom.orderservice.model.OrderLineItem;
 import com.ecom.orderservice.model.OrderPaymentStatus;
@@ -40,7 +38,7 @@ public class OrderService {
     private static final String INVENTORY_ENDPONT="http://inventory-service:30002/api/inventories/";
     private static final String PRODUCT_ENDPOINT="http://product-service:30001/api/products/";
 
-    public OrderResponse createOrder(OrderRequest orderRequest){
+    public Order createOrder(OrderRequest orderRequest){
 
         Order order=new Order();
         order.setId(idGenerator.next());
@@ -54,9 +52,7 @@ public class OrderService {
         order.setStatus(OrderStatus.ORDER_STATUS_CREATED);
         order.setPaymentStatus(OrderPaymentStatus.ORDER_PAYMENT_STATUS_PENDING);
         claimInventory(orderLineItems);
-        Order orderSaved=orderRepository.save(order);
-
-        return orderResponseFrom(orderSaved);
+        return orderRepository.save(order);
     }
 
     private void claimInventory(List<OrderLineItem> orderLineItems){
@@ -88,50 +84,43 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse getOrder(Long orderId){
+    public Order getOrder(Long orderId){
         Optional<Order> order=orderRepository.findById(orderId);
         if(!order.isPresent()){
             return null;
         }
-        return orderResponseFrom(order.get());
+        return order.get();
     }
 
-
-
-    public List<OrderResponse> getOrders(){
-        List<Order> orders=orderRepository.findAll();
-        return orders.stream().map(this::orderResponseFrom).toList();
+    public List<Order> getOrders(){
+        return orderRepository.findAll();
     }
 
 
     @Transactional
-    public OrderResponse updateOrderPaymentStatus(Long orderId, OrderPaymentStatus paymentStatus){
+    public Order updateOrderPaymentStatus(Long orderId, OrderPaymentStatus paymentStatus){
         Order order=orderRepository.findById(orderId).get();
         if(order.getPaymentStatus()==paymentStatus){
-            return orderResponseFrom(order);
+            return order;
         }
-
         markClaimedInventory(order.getOrderLineItems());
-
         if(!validateUpdateOrderPaymentStatus(order, paymentStatus)){
             logger.error("order payment status update not allowed");
             return null;
         }
         order.setPaymentStatus(paymentStatus);
-        order=orderRepository.save(order);
-        return orderResponseFrom(order);
+        return orderRepository.save(order);
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus){
+    public Order updateOrderStatus(Long orderId, OrderStatus orderStatus){
         Order order=orderRepository.findById(orderId).get();
         if(!validateUpdateOrderStatus(order, orderStatus)){
             logger.error("order status update not allowed");
             return null;
         }
         order.setStatus(orderStatus);
-        order=orderRepository.save(order);
-        return orderResponseFrom(order);
+        return orderRepository.save(order);
     }
 
     private boolean validateUpdateOrderStatus(Order order, OrderStatus newOrderStatus){
@@ -210,40 +199,7 @@ public class OrderService {
         order.setTotalAmount(lineItemTotal.add(order.getTotalAmount()));
 
         return orderLineItem;
-
     }
-
-    private OrderLineItemResponse orderLineItemResponseFrom(OrderLineItem orderLineItem){
-        OrderLineItemResponse orderLineItemResponse=new OrderLineItemResponse();
-        InventoryResponse inventoryResponse= webClient.get()
-                .uri(INVENTORY_ENDPONT+orderLineItem.getInventoryId())
-                .retrieve()
-                .bodyToMono(InventoryResponse.class)
-                .block();
-        orderLineItemResponse.setId(orderLineItem.getId().toString());
-        orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount().toString());
-        orderLineItemResponse.setQuantity(orderLineItem.getQuantity());
-        orderLineItemResponse.setProductId(inventoryResponse.getProductId());
-
-        return orderLineItemResponse;
-
-    }
-
-
-    private OrderResponse orderResponseFrom(Order order){
-        OrderResponse orderResponse=new OrderResponse();
-
-        orderResponse.setId(order.getId().toString());
-        orderResponse.setOrderLineItemResponses(
-            order.getOrderLineItems().stream().map(orderLineItem -> orderLineItemResponseFrom(orderLineItem)).toList()
-        );
-        orderResponse.setOrderNumber(order.getOrderNumber());
-        orderResponse.setTotalAmount(order.getTotalAmount().toString());
-        orderResponse.setPaymentStatus(order.getPaymentStatus());
-        orderResponse.setStatus(order.getStatus());
-        return orderResponse;
-    }
-
 }
 
 
