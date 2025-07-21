@@ -18,6 +18,7 @@ import com.ecom.inventoryservice.dto.IncrementInventoryQuantityRequest;
 import com.ecom.inventoryservice.dto.InventoryRequest;
 import com.ecom.inventoryservice.dto.InventoryResponse;
 import com.ecom.inventoryservice.model.Inventory;
+import com.ecom.inventoryservice.model.InventoryOperation;
 import com.ecom.inventoryservice.service.InventoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,7 +84,7 @@ public class InventoryController {
 
     @PostMapping("/{id}/claim")
     public ClaimInventoryResponse claimInventoryQuantity(@PathVariable("id") String id, @RequestBody ClaimInventoryRequest claimInventoryRequest ){
-        return inventoryService.claimInventory(Long.valueOf(id), claimInventoryRequest.getQuantity());
+        return claimInventoryResponseFrom(inventoryService.claimInventory(Long.valueOf(id), claimInventoryRequest.getQuantity()));
     }
 
     @PatchMapping("/claim/{claim_id}/mark")
@@ -91,4 +92,7 @@ public class InventoryController {
         inventoryService.markInventoryClaimSold(Long.valueOf(claimId));
     }
 
+    private ClaimInventoryResponse claimInventoryResponseFrom(InventoryOperation inventoryOperation){
+        return new ClaimInventoryResponse(inventoryOperation.getOperationId().toString());
+    }
 }

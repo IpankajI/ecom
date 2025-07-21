@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecom.paymentservice.dto.PaymentRequest;
 import com.ecom.paymentservice.dto.PaymentResponse;
 import com.ecom.paymentservice.dto.UpdatePaymentStatusRequest;
+import com.ecom.paymentservice.model.Payment;
 import com.ecom.paymentservice.service.PaymentService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,19 +30,29 @@ public class PaymentController {
         return "ok";
     }
 
-
     @PostMapping("")
     public PaymentResponse createPayment(@RequestBody PaymentRequest paymentRequest){
-        return paymentService.initiatePayment(paymentRequest);
+        return paymentResponseFrom(paymentService.initiatePayment(paymentRequest));
     }
 
     @GetMapping("/{paymentId}")
     public PaymentResponse getPayment(@PathVariable("paymentId") Long paymentId){
-        return paymentService.getPayment(paymentId);
+        return paymentResponseFrom(paymentService.getPayment(paymentId));
     }
 
     @PatchMapping("/{paymentId}/status")
     public PaymentResponse updatePaymentStatus(@PathVariable("paymentId") Long paymentId, @RequestBody UpdatePaymentStatusRequest updatePaymentStatusRequest){
-        return paymentService.updateStatus(paymentId, updatePaymentStatusRequest.getPaymentStatus());
+        return paymentResponseFrom(paymentService.updateStatus(paymentId, updatePaymentStatusRequest.getPaymentStatus()));
+    }
+
+    private PaymentResponse paymentResponseFrom(Payment payment){
+        return PaymentResponse.builder()
+            .createdAt(payment.getCreatedAt())
+            .id(payment.getId().toString())
+            .orderId(payment.getOrderId().toString())
+            .paymentMode(payment.getPaymentMode())
+            .paymentStatus(payment.getPaymentStatus())
+            .updatedAt(payment.getUpdatedAt())
+            .build();
     }
 }

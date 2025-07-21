@@ -3,7 +3,6 @@ package com.ecom.productservice.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -35,15 +34,12 @@ public class ProductService {
         productRepository.save(product);
         log.info("product with id: {} created", product.getId());
     }
-    
 
-    public List<ProductResponse> getProducts(){
-        List<Product> products=productRepository.findAll();
-
-        return products.stream().map(this::productResponseFrom).toList();
+    public List<Product> getProducts(){
+        return productRepository.findAll();
     }
 
-    public ProductResponse getProduct(String productId){
+    public Product getProduct(String productId){
         Optional<Product> product=productRepository.findById(productId);
 
         if(!product.isPresent()){
@@ -51,15 +47,7 @@ public class ProductService {
             return null;
         }
  
-        return productResponseFrom(product.get());
+        return product.get();
     }
 
-    private ProductResponse productResponseFrom(Product product){
-        return ProductResponse.builder()
-            .description(product.getDescription())
-            .id(product.getId())
-            .name(product.getName())
-            .price(product.getPrice().toString())
-            .build();
-    }
 }
