@@ -7,6 +7,7 @@ building an e-commerce plaform with java and spring.
   - [x] phone-number/otp with twilio
   - [x] auth0 login
   - [x] jwt token
+  - [ ] Oauth 2.0 with github(in progress)
   - [ ] api-key/api-secret
   - [ ] passkeys
 - [x] implement inventory and claim mechanism to prevent overselling
