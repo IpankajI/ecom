@@ -1,4 +1,4 @@
-building an e-commerce plaform with java and spring(my weekend timepass).
+building an e-commerce plaform with java and spring.
 
 # run all services, databases and sqs
 ```
