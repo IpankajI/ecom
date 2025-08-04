@@ -7,7 +7,7 @@ building an e-commerce plaform with java and spring.
   - [x] phone-number/otp with twilio
   - [x] auth0 login
   - [x] jwt token
-  - [ ] Oauth 2.0 with github(in progress)
+  - [x] OAuth 2.0 with github
   - [ ] api-key/api-secret
   - [ ] passkeys
 - [x] implement inventory and claim mechanism to prevent overselling
@@ -20,6 +20,7 @@ building an e-commerce plaform with java and spring.
 - [x] add static code analysis using sonarqube
 - [x] set up docker-compose and local dev environment(hot loading) with linux inotify-tools and spring-boot-devtools
 - [x] api documentation using swagger spring package
+- [ ] add redis to store OAuth 2.0 state, code-verifier and code-challenge
 - [ ] add role based login for users separating merchants and customers
 - [ ] design doc
 - [ ] improve test coverage

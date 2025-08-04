@@ -25,4 +25,5 @@ public class AppUser {
     private String phoneNumber;
     private String name;
     private String password;
+    private String email;
 }

@@ -36,4 +36,7 @@ public class AppUserService {
         return bCryptPasswordEncoder.matches(password, appUser.getPassword());
     }
 
+    public AppUser getAppUserByEmail(String email){
+        return appUserRepository.getByEmail(email);
+    }
 }

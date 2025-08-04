@@ -41,9 +41,11 @@ public class WebSecurityConfig{
                             .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()      
                             .requestMatchers(HttpMethod.POST, "/v1/api/auth/sign-up/**").permitAll() 
                             .requestMatchers(HttpMethod.POST, "/v1/api/auth/otp/request/**").permitAll() 
+                            .requestMatchers(HttpMethod.GET, "/v1/api/auth/login/social/**").permitAll() 
+                            // .requestMatchers(HttpMethod.GET, "/v1/api/auth/login/social/github/callback/**").permitAll() 
                             .anyRequest().authenticated()
             )
-            .csrf(csrf->csrf.disable())
+            .headers((headers->headers.disable()))
             .addFilterBefore(authFilterOtp, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(authFilterJwt, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(authFilterUP, UsernamePasswordAuthenticationFilter.class)
@@ -53,3 +55,4 @@ public class WebSecurityConfig{
     }
 
 }
+// 

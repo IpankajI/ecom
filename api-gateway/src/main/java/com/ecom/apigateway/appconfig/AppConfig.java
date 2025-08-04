@@ -18,6 +18,14 @@ public class AppConfig {
 	public String twilioUsername;
 	@Value("${TWILIO_PASSWORD}")
 	public String twilioPassword;
+
+	// github oauth 2.0
+	@Value("${GITHUB_CLIENT_ID}")
+	public String githubClientId;
+	@Value("${GITHUB_CLIENT_SECRET}")
+	public String githubClientSecret;
+
+
 	@Bean
 	public WebClient webClient(){
 		return WebClient.builder().build();

@@ -14,6 +14,7 @@ import com.ecom.userservice.model.AppUser;
 import com.ecom.userservice.service.AppUserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.ws.rs.QueryParam;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,6 +31,7 @@ public class AppUserController {
             .name(request.getName())
             .password(request.getPassword())
             .phoneNumber(request.getPhoneNumber())
+            .email(request.getEmail())
             .build();
         appUserService.createAppUser(appUser);
 
@@ -41,11 +43,25 @@ public class AppUserController {
         return toAppUserResponseFrom(appUserService.getAppUserByUsername(username));
     }
 
+    @GetMapping("/search")
+    public AppUserResponse getAppUser(@QueryParam("email") String email, @QueryParam("phone") String phone){
+        if(email!=null){
+             return toAppUserResponseFrom(appUserService.getAppUserByEmail(email));
+        }
+        else if(phone!=null){
+            return toAppUserResponseFrom(appUserService.getAppUserByPhoneNumber(phone));
+        }
+        else{
+            throw new RuntimeException("cannot get user");
+        }
+    }
+
     private AppUserResponse toAppUserResponseFrom(AppUser appUser){
         return AppUserResponse.builder()
             .id(appUser.getId())
             .name(appUser.getName())
             .phoneNumber(appUser.getPhoneNumber())
+            .email(appUser.getEmail())
             .build();
     }
 

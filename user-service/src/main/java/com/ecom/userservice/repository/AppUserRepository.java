@@ -7,4 +7,5 @@ import com.ecom.userservice.model.AppUser;
 public interface AppUserRepository extends JpaRepository<AppUser, Long>{
     AppUser getByPhoneNumber(String phoneNumber);
     AppUser getByName(String name);
+    AppUser getByEmail(String email);
 }

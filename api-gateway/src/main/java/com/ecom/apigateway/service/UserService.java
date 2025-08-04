@@ -34,6 +34,17 @@ public class UserService {
                             .block();
     }
 
+    public UserResponse getUserByEmail(String email){
+       return WebClient.create("http://user-service:30004")
+            .get()
+            .uri(uriBuilder -> uriBuilder.path("/api/users/search")
+                .queryParam("email", email)
+                .build())
+            .retrieve()
+            .bodyToMono(UserResponse.class)
+            .block();
+    }
+
     public UserResponse createUser(SignUpRequest signUpRequest){
         return webClient.post()
                             .uri("http://user-service:30004/api/users")

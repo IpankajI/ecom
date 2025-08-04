@@ -11,4 +11,5 @@ public class CreateAppUserRequest {
     private String phoneNumber;
     private String name;
     private String password;
+    private String email;
 }
