@@ -1,4 +1,17 @@
-building an e-commerce plaform with java and spring.
+building an e-commerce plaform with java and spring(my weekend timepass).
+
+# run all services, databases and sqs
+```
+docker-compose --env-file .env up
+```
+
+# API documentation pages(swagger-ui)
+1. http://localhost:8080/api/docs/auth/swagger-ui/index.html
+2. http://localhost:8080/api/docs/inventories/swagger-ui/index.html
+3. http://localhost:8080/api/docs/orders/swagger-ui/index.html
+4. http://localhost:8080/api/docs/payments/swagger-ui/index.html
+5. http://localhost:8080/api/docs/products/swagger-ui/index.html
+
 
 # Roadmap:
 - [x] set up project
@@ -29,15 +42,3 @@ building an e-commerce plaform with java and spring.
 - [ ] add validations for all data
 - [ ] add paginations
 - [ ] add configuration management using spring-config-server
-
-# run all services, databases and sqs
-```
-docker-compose --env-file .env up
-```
-
-# API documentation pages(swagger-ui)
-1. http://localhost:8080/api/docs/auth/swagger-ui/index.html
-2. http://localhost:8080/api/docs/inventories/swagger-ui/index.html
-3. http://localhost:8080/api/docs/orders/swagger-ui/index.html
-4. http://localhost:8080/api/docs/payments/swagger-ui/index.html
-5. http://localhost:8080/api/docs/products/swagger-ui/index.html
