@@ -40,5 +40,6 @@ docker-compose --env-file .env up
 - [ ] integrate github CI/CD
 - [ ] standardise exception/error handling
 - [ ] add validations for all data
-- [ ] add paginations
+- [x] add cursor based paginations
+  - [x] list products api
 - [ ] add configuration management using spring-config-server
