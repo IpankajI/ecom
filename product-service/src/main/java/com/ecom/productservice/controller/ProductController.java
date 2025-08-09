@@ -41,7 +41,7 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductResponse getProduct(@PathVariable("productId") String productId){
+    public ProductResponse getProduct(@PathVariable("productId") Long productId){
         return productResponseFrom(productService.getProduct(productId));
     }
 

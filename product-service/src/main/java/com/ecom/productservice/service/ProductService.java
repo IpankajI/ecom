@@ -11,6 +11,7 @@ import com.ecom.productservice.dto.ProductRequest;
 import com.ecom.productservice.dto.ProductResponse;
 import com.ecom.productservice.model.Product;
 import com.ecom.productservice.repository.ProductRepository;
+import com.ecom.productservice.utils.IDGenerator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +24,11 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final Logger logger;
+    private final IDGenerator idGenerator;
 
     public void addProduct(ProductRequest productRequest){
         Product product= Product.builder()
+            .id(idGenerator.next())
             .name(productRequest.getName())
             .description(productRequest.getDescription())
             .price(BigDecimal.valueOf(Long.valueOf(productRequest.getPrice())))
@@ -39,7 +42,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Product getProduct(String productId){
+    public Product getProduct(Long productId){
         Optional<Product> product=productRepository.findById(productId);
 
         if(!product.isPresent()){
