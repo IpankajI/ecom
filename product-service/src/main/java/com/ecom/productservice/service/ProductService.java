@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ecom.productservice.dto.ProductRequest;
-import com.ecom.productservice.dto.ProductResponse;
 import com.ecom.productservice.model.Product;
 import com.ecom.productservice.repository.ProductRepository;
 import com.ecom.productservice.utils.IDGenerator;
@@ -38,8 +40,13 @@ public class ProductService {
         log.info("product with id: {} created", product.getId());
     }
 
-    public List<Product> getProducts(){
-        return productRepository.findAll();
+    public List<Product> getProducts(Long before, Long after, Integer limit){
+        if(before>0){
+            Pageable pageable=PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC,"_id"));
+            return productRepository.findProductsWithLessThanId(before, pageable).reversed();
+        }
+        Pageable pageable=PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC,"_id"));
+        return productRepository.findProductsWithGreaterThanId(after, pageable);
     }
 
     public Product getProduct(Long productId){

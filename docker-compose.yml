@@ -120,7 +120,7 @@ services:
     networks:
       - ecom-network
     depends_on:
-      - postgres
+      - mongo
       - registry-server
     volumes:
       - ./product-service:/app
