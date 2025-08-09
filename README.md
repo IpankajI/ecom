@@ -33,7 +33,7 @@ docker-compose --env-file .env up
 - [x] add static code analysis using sonarqube
 - [x] set up docker-compose and local dev environment(hot loading) with linux inotify-tools and spring-boot-devtools
 - [x] api documentation using swagger spring package
-- [ ] add redis to store OAuth 2.0 state, code-verifier and code-challenge
+- [x] add redis to store OAuth 2.0 state, code-verifier and code-challenge
 - [ ] add role based login for users separating merchants and customers
 - [ ] design doc
 - [ ] improve test coverage

@@ -37,6 +37,15 @@ services:
       - ecom-network
     volumes:
       - ./tmp/mongo/data/db:/data/db
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./tmp/redis_data:/data
+    restart: unless-stopped
+    networks:
+      - ecom-network
   registry-server:
     build:
       context: registry-server
@@ -67,6 +76,7 @@ services:
       - ecom-network
     depends_on:
       - postgres
+      - redis
     volumes:
       - ./api-gateway:/app
   event-handler:

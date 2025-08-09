@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.ecom.apigateway.appconfig.AppConfig;
 import com.ecom.apigateway.appconfig.HttpXHeader;
+import com.ecom.apigateway.dto.Auth2Code;
 import com.ecom.apigateway.dto.GitHubAuth2Response;
 import com.ecom.apigateway.dto.GitHubEmailResponse;
 import com.ecom.apigateway.dto.SignUpRequest;
@@ -32,7 +34,6 @@ import com.ecom.apigateway.service.OtpService;
 import com.ecom.apigateway.service.UserService;
 import com.ecom.apigateway.utils.JwtUtil;
 import com.ecom.apigateway.utils.OAuth2;
-import com.ecom.apigateway.utils.Redis;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.QueryParam;
@@ -48,7 +49,8 @@ public class AuthenticationController {
     private final UserService userservice;
     private final WebClient webClient;
     private final AppConfig appConfig;
-    private final Redis redis;
+    // private final Redis redis;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /*
      * password is not used in this method, however it's required for swagger-ui to show it in form
@@ -102,10 +104,8 @@ public class AuthenticationController {
         catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e.getMessage());
         }
-
-        redis.set(state, codeVerifier, codeChallenge);
-
-
+        Auth2Code code=new Auth2Code(codeVerifier, codeChallenge);
+        redisTemplate.opsForValue().set(state, code);
         String uri=UriComponentsBuilder.fromUriString("https://github.com/login/oauth/authorize")
         .queryParam("code_challenge", codeChallenge)
         .queryParam("code_challenge_method", "S256")
@@ -123,8 +123,10 @@ public class AuthenticationController {
 
     @GetMapping("/login/social/github/callback")
     public TokenResponse loginGithubCallback(@QueryParam("code") String code, @QueryParam("state") String state){
-
-        
+        Auth2Code auth2Code=(Auth2Code)redisTemplate.opsForValue().get(state);
+        if(auth2Code==null){
+            throw new RuntimeException("no auth code found");
+        }
         GitHubAuth2Response gitHubAuth2Response=webClient.post()
                 .uri("https://github.com/login/oauth/access_token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -133,12 +135,11 @@ public class AuthenticationController {
                 .with("client_id", appConfig.githubClientId)
                 .with("client_secret", appConfig.githubClientSecret)
                 .with("redirect_uri", "http://localhost:8080/v1/api/auth/login/social/github/callback")
-                .with("code_verifier", redis.getCodeVerifier(state))
+                .with("code_verifier", auth2Code.codeVerifier())
                 .with("code", code))
                 .retrieve()
                 .bodyToMono(GitHubAuth2Response.class)
                 .block();
-
         String email=getPrimaryEmailForGithubAuth(gitHubAuth2Response.getAccessToken());
 
         UserResponse userResponse=userservice.getUserByEmail(email);
