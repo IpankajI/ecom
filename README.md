@@ -20,7 +20,7 @@ docker-compose --env-file .env up
   - [x] phone-number/otp with twilio
   - [x] auth0 login
   - [x] jwt token
-  - [x] OAuth 2.0 with github(GitHub Login)
+  - [x] OAuth 2.0 with github(GitHub Login) using PKCE
   - [ ] api-key/api-secret
   - [ ] passkeys
 - [x] implement inventory and claim mechanism to prevent overselling
