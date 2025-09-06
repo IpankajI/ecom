@@ -33,7 +33,7 @@ public class AppUserController {
             .phoneNumber(request.getPhoneNumber())
             .email(request.getEmail())
             .build();
-        appUserService.createAppUser(appUser);
+        appUser = appUserService.createAppUser(appUser);
 
         return toAppUserResponseFrom(appUser);
     }
