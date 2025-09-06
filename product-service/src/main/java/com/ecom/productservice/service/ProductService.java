@@ -28,7 +28,7 @@ public class ProductService {
     private final Logger logger;
     private final IDGenerator idGenerator;
 
-    public void addProduct(ProductRequest productRequest){
+    public Product addProduct(ProductRequest productRequest){
         Product product= Product.builder()
             .id(idGenerator.next())
             .name(productRequest.getName())
@@ -36,8 +36,7 @@ public class ProductService {
             .price(BigDecimal.valueOf(Long.valueOf(productRequest.getPrice())))
             .build();
 
-        productRepository.save(product);
-        log.info("product with id: {} created", product.getId());
+        return productRepository.save(product);
     }
 
     public List<Product> getProducts(Long before, Long after, Integer limit){
