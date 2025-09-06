@@ -102,7 +102,6 @@ class ProductServiceTests {
         assertEquals(productId, foundProduct.getId());
         assertEquals(price, foundProduct.getPrice());
 
-
         founProducts=productService.getProducts(0l, productId, 1);
         assertEquals(1, founProducts.size());
 

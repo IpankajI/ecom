@@ -30,14 +30,10 @@ class ProductRepositoryTests {
     private final BigDecimal price=BigDecimal.valueOf(65000+1);
     private final Long productId=11L;
 
-    @Spy
     private Product product;
     @BeforeEach
     void setUp(){
-        product.setDescription(description);
-        product.setId(productId);
-        product.setName(name);
-        product.setPrice(price);
+        product=new Product(productId, name, description, price);
     }
 
     @AfterEach
