@@ -62,10 +62,10 @@ class PaymentServiceTests {
             .paymentMode(PaymentMode.PAYMENT_MODE_CASH)
             .build();
         
-        orderResponse = new OrderResponse();
-        orderResponse.setId(123L);
-        orderResponse.setTotalAmount(BigDecimal.valueOf(100.00));
-
+        orderResponse = OrderResponse.builder()
+            .id(123L)
+            .totalAmount(BigDecimal.valueOf(100.00))
+            .build();
         expectedPayment = Payment.builder()
             .id(456L)
             .orderId(1000L)
