@@ -21,6 +21,8 @@ import com.ecom.orderservice.model.OrderLineItem;
 import com.ecom.orderservice.model.OrderPaymentStatus;
 import com.ecom.orderservice.model.OrderStatus;
 import com.ecom.orderservice.repository.OrderRepository;
+import com.ecom.orderservice.state.OrderPaymentState;
+import com.ecom.orderservice.state.OrderPaymentStateFactory;
 import com.ecom.orderservice.utils.IDGenerator;
 
 import lombok.RequiredArgsConstructor;
@@ -64,7 +66,6 @@ public class OrderService {
         for(OrderLineItem orderLineItem: orderLineItems){
             inventoryServiceClient.markClaimedInventory(orderLineItem.getInventoryClaimId());
         }
-
     }
 
     @Transactional
@@ -83,16 +84,16 @@ public class OrderService {
 
     @Transactional
     public Order updateOrderPaymentStatus(Long orderId, OrderPaymentStatus paymentStatus){
-        Order order=orderRepository.findById(orderId).get();
-        if(order.getPaymentStatus()==paymentStatus){
-            return order;
+        Optional<Order> orderDate=orderRepository.findById(orderId);
+        if(!orderDate.isPresent()){
+             throw new RuntimeException("order not found");
+        }
+        Order order=orderDate.get();
+        OrderPaymentState orderPaymentState=OrderPaymentStateFactory.getState(order);
+        if(!orderPaymentState.update(order, paymentStatus)){
+            throw new RuntimeException("order payment state cannot be updated");
         }
         markClaimedInventory(order.getOrderLineItems());
-        if(!validateUpdateOrderPaymentStatus(order, paymentStatus)){
-            logger.error("order payment status update not allowed");
-            return null;
-        }
-        order.setPaymentStatus(paymentStatus);
         return orderRepository.save(order);
     }
 
@@ -123,36 +124,7 @@ public class OrderService {
         }
         return false;
     }
-
-    private boolean validateUpdateOrderPaymentStatus(Order order, OrderPaymentStatus newOrderPaymentStatus){
-        switch (order.getPaymentStatus()) {
-            case ORDER_PAYMENT_STATUS_INITIATED:
-                if(newOrderPaymentStatus==OrderPaymentStatus.ORDER_PAYMENT_STATUS_COMPLETED){
-                    return true;
-                }
-                break;
-            case OrderPaymentStatus.ORDER_PAYMENT_STATUS_PENDING:
-                if(newOrderPaymentStatus==OrderPaymentStatus.ORDER_PAYMENT_STATUS_INITIATED){
-                    return true;
-                }
-                break;
-            case OrderPaymentStatus.ORDER_PAYMENT_STATUS_COMPLETED:
-                if(newOrderPaymentStatus==OrderPaymentStatus.ORDER_PAYMENT_STATUS_REFUND_INITIATED){
-                    return true;
-                }
-                break;
-            case OrderPaymentStatus.ORDER_PAYMENT_STATUS_REFUND_INITIATED:
-                if(newOrderPaymentStatus==OrderPaymentStatus.ORDER_PAYMENT_STATUS_REFUNDED){
-                    return true;
-                }
-                break;
-        
-            default:
-                break;
-        }
-        return false;
-    }
-
+    
     private OrderLineItem orderLineItemFrom(OrderLineItemRequest orderLineItemRequest, Order order){
         
         Inventory inventory=inventoryServiceClient.getInventoryById(orderLineItemRequest.getInventoryId());

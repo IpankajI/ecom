@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Component
 public class InventoryServiceClient {
     private final WebClient webClient;
-    private static final String INVENTORY_SERVICE_ENDPOINT="http://product-service:30001/api/products/";
+    private static final String INVENTORY_SERVICE_ENDPOINT="http://inventory-service:30002/api/inventories/";
 
 
     public Inventory getInventoryById(String id){

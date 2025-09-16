@@ -64,10 +64,14 @@ public class PaymentService {
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public Payment updateStatus(Long paymentId, PaymentStatus paymentStatus){
-        Payment payment=paymentRepository.findById(paymentId).get();
-        if(!validateStatusUpdate(payment, paymentStatus)){
-            log.error("invalid request for payment update");
+        Optional<Payment> paymentData=paymentRepository.findById(paymentId);
+        if(!paymentData.isPresent()){
             return null;
+        }
+        Payment payment=paymentData.get();
+        if(!validateStatusUpdate(payment, paymentStatus)){
+            log.error("invalid request for payment update: "+paymentId);
+            throw new RuntimeException("cannot update payment");
         }
         payment.setPaymentStatus(paymentStatus);
         payment=paymentRepository.save(payment);
