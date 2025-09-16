@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class InventoryClaimRequest {
-    private Integer quantity;
+public class InventoryClaim {
+    private String claimId;
 }

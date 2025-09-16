@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class InventoryResponse {
+public class Inventory {
     private String id;
     private String skuCode;
     private Integer quantity;

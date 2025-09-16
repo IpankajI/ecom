@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderServiceClient {
     private final WebClient webClient;
+    private static final String ORDER_SERVICE_ENDPOINT="http://order-service:30003/api/orders/";
     public OrderResponse getOrderById(String orderId) {
         return webClient
             .get()
-            .uri("http://order-service:30003/api/orders/"+orderId)
+            .uri(ORDER_SERVICE_ENDPOINT+orderId)
             .retrieve()
             .bodyToMono(OrderResponse.class)
             .block();

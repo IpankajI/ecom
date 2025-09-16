@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.ecom.orderservice.dto.InventoryResponse;
+
+import com.ecom.orderservice.dto.Inventory;
 import com.ecom.orderservice.dto.OrderLineItemResponse;
 import com.ecom.orderservice.dto.OrderPaymentStatusRequest;
 import com.ecom.orderservice.dto.OrderRequest;
@@ -79,10 +80,10 @@ public class OrderController {
     }
     private OrderLineItemResponse orderLineItemResponseFrom(OrderLineItem orderLineItem){
         OrderLineItemResponse orderLineItemResponse=new OrderLineItemResponse();
-        InventoryResponse inventoryResponse= webClient.get()
+        Inventory inventoryResponse= webClient.get()
                 .uri(INVENTORY_ENDPONT+orderLineItem.getInventoryId())
                 .retrieve()
-                .bodyToMono(InventoryResponse.class)
+                .bodyToMono(Inventory.class)
                 .block();
         orderLineItemResponse.setId(orderLineItem.getId().toString());
         orderLineItemResponse.setTotalAmount(orderLineItem.getTotalAmount().toString());

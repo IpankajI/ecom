@@ -8,13 +8,14 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.ecom.orderservice.dto.InventoryClaimRequest;
-import com.ecom.orderservice.dto.InventoryClaimResponse;
-import com.ecom.orderservice.dto.InventoryResponse;
+import com.ecom.orderservice.client.InventoryServiceClient;
+import com.ecom.orderservice.client.ProductServiceClient;
+import com.ecom.orderservice.dto.Inventory;
+import com.ecom.orderservice.dto.InventoryClaim;
 import com.ecom.orderservice.dto.OrderLineItemRequest;
 import com.ecom.orderservice.dto.OrderRequest;
+import com.ecom.orderservice.dto.Product;
 import com.ecom.orderservice.model.Order;
 import com.ecom.orderservice.model.OrderLineItem;
 import com.ecom.orderservice.model.OrderPaymentStatus;
@@ -22,21 +23,16 @@ import com.ecom.orderservice.model.OrderStatus;
 import com.ecom.orderservice.repository.OrderRepository;
 import com.ecom.orderservice.utils.IDGenerator;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final WebClient webClient;
     private final IDGenerator idGenerator;
     private final Logger logger;
-    private static final String INVENTORY_ENDPONT="http://inventory-service:30002/api/inventories/";
-    private static final String PRODUCT_ENDPOINT="http://product-service:30001/api/products/";
+    private final ProductServiceClient productServiceClient;
+    private final InventoryServiceClient inventoryServiceClient;
 
     public Order createOrder(OrderRequest orderRequest){
 
@@ -58,27 +54,15 @@ public class OrderService {
     private void claimInventory(List<OrderLineItem> orderLineItems){
 
         for(OrderLineItem orderLineItem: orderLineItems){
-            InventoryClaimRequest inventoryClaimRequest=InventoryClaimRequest.builder().quantity(orderLineItem.getQuantity()).build();
-            InventoryClaimResponse inventoryClaimResponse=webClient.post()
-            .uri(INVENTORY_ENDPONT+orderLineItem.getInventoryId()+"/claim")
-            .bodyValue(inventoryClaimRequest)
-            .retrieve()
-            .bodyToMono(InventoryClaimResponse.class)
-            .block();
-
-            orderLineItem.setInventoryClaimId(Long.valueOf(inventoryClaimResponse.getClaimId()));
+            InventoryClaim inventoryClaim=inventoryServiceClient.claimInventory(orderLineItem.getInventoryId(), orderLineItem.getQuantity());
+            orderLineItem.setInventoryClaimId(Long.valueOf(inventoryClaim.getClaimId()));
         }
 
     }
 
     private void markClaimedInventory(List<OrderLineItem> orderLineItems){
-
         for(OrderLineItem orderLineItem: orderLineItems){
-            webClient.patch()
-                .uri(INVENTORY_ENDPONT+"/claim/"+orderLineItem.getInventoryClaimId()+"/mark")
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            inventoryServiceClient.markClaimedInventory(orderLineItem.getInventoryClaimId());
         }
 
     }
@@ -171,18 +155,8 @@ public class OrderService {
 
     private OrderLineItem orderLineItemFrom(OrderLineItemRequest orderLineItemRequest, Order order){
         
-        InventoryResponse inventoryResponse= webClient.get()
-                .uri(INVENTORY_ENDPONT+orderLineItemRequest.getInventoryId())
-                .retrieve()
-                .bodyToMono(InventoryResponse.class)
-                .block();
-        
-        Product product=webClient.get()
-            .uri(PRODUCT_ENDPOINT+inventoryResponse.getProductId())
-            .retrieve()
-            .bodyToMono(Product.class)
-            .block();
-
+        Inventory inventory=inventoryServiceClient.getInventoryById(orderLineItemRequest.getInventoryId());
+        Product product=productServiceClient.getProductById(inventory.getProductId());
 
         OrderLineItem orderLineItem=new OrderLineItem();
         
@@ -200,18 +174,4 @@ public class OrderService {
 
         return orderLineItem;
     }
-}
-
-
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-class Product {
-
-    private String id;
-    private String name;
-    private String description;
-    private BigDecimal price;
-    
 }
